@@ -49,11 +49,37 @@ const TAB_ITEMS = [
   { name: 'Settings', icon: 'settings' },
 ];
 
+// ─── Demo Banner ──────────────────────────────────────────────────────────────
+// Always visible at top of screen during demo mode. Tap Exit to return to real state.
+function DemoBanner() {
+  const { isDemoMode, exitDemo } = useApp();
+  if (!isDemoMode) return null;
+  return (
+    <View style={demoBanner.bar} pointerEvents="box-none">
+      <Text style={demoBanner.label}>👀 Demo Mode — read only</Text>
+      <TouchableOpacity style={demoBanner.btn} onPress={exitDemo} activeOpacity={0.85}>
+        <Text style={demoBanner.btnText}>Exit Demo</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// Banner height = paddingTop(44 status bar) + text row (~20) + paddingBottom(10) = 74
+// This is exported so knowledge-base agents can reference it.
+export const DEMO_BANNER_HEIGHT = 74;
+
+const demoBanner = StyleSheet.create({
+  bar:     { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 999, elevation: 999, backgroundColor: '#AEB784', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 44, paddingBottom: 10 },
+  label:   { fontFamily: 'Fungis-Bold', fontSize: 12, color: '#222629' },
+  btn:     { backgroundColor: '#222629', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6 },
+  btnText: { fontFamily: 'Fungis-Bold', fontSize: 12, color: '#AEB784' },
+});
+
 // ─── App Lock PIN Overlay ─────────────────────────────────────────────────────
 // Sits inside AppProvider so it can read settings.
 // Watches AppState — shows PIN pad whenever app comes back to foreground with lock enabled.
 function AppLockOverlay({ children }) {
-  const { settings }      = useApp();
+  const { settings, isDemoMode } = useApp();
   const [locked, setLocked] = useState(false);
   const [pin,    setPin  ]  = useState('');
   const [shake,  setShake]  = useState(false);
@@ -61,6 +87,7 @@ function AppLockOverlay({ children }) {
   const appStateRef         = useRef(AppState.currentState);
 
   useEffect(() => {
+    if (isDemoMode) { setLocked(false); return; }
     if (settings.appLockEnabled && settings.appLockPin) {
       setLocked(true);
       setPin('');
@@ -68,16 +95,15 @@ function AppLockOverlay({ children }) {
     const sub = AppState.addEventListener('change', (next) => {
       const prev = appStateRef.current;
       appStateRef.current = next;
-      // background / inactive → active: lock if enabled
       if (prev.match(/inactive|background/) && next === 'active') {
-        if (settings.appLockEnabled && settings.appLockPin) {
+        if (!isDemoMode && settings.appLockEnabled && settings.appLockPin) {
           setLocked(true);
           setPin('');
         }
       }
     });
     return () => sub.remove();
-  }, [settings.appLockEnabled, settings.appLockPin]);
+  }, [settings.appLockEnabled, settings.appLockPin, isDemoMode]);
 
   const triggerShake = () => {
     setPin('');
@@ -111,7 +137,10 @@ function AppLockOverlay({ children }) {
 
   return (
     <View style={{ flex: 1 }}>
-      {children}
+      <DemoBanner />
+      <View style={{ flex: 1, marginTop: isDemoMode ? DEMO_BANNER_HEIGHT : 0 }}>
+        {children}
+      </View>
       <Modal visible={locked} animationType="fade" transparent={false} statusBarTranslucent>
         <View style={lock.root}>
           <Text style={lock.appName}>Finova</Text>

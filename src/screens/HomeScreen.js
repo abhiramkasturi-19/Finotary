@@ -111,7 +111,7 @@ export default function HomeScreen({ navigation }) {
               <Text style={s.badgeText}>{pctLabel}</Text>
             </View>
           </View>
-          <Text style={s.balanceAmount}>{balance < 0 ? '-' : ''}{fmt(balance)}</Text>
+          <Text style={s.balanceAmount} adjustsFontSizeToFit numberOfLines={1}>{balance < 0 ? '-' : ''}{fmt(balance)}</Text>
           <Text style={s.walletDate}>{MONTHS[now.getMonth()]}-{now.getFullYear().toString().slice(-2)} : Present Month</Text>
           <View style={s.subRow}>
             <View style={s.subItem}>

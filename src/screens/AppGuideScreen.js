@@ -39,6 +39,10 @@ const FREE_FEATURES = [
     title: 'Privacy',
     desc: 'All data stays on your device. Nothing is sent to any server. Your transactions and backup files never leave your phone unless you choose to share them.',
   },
+  {
+    title: 'Demo Mode',
+    desc: 'Explore Finova with 2 years of realistic sample data — no sign-up needed. Tap Try Demo in Settings → Data Management. The app enters read-only mode with a green banner at the top. Tap Exit Demo to return to your real data instantly. Nothing from the demo is ever saved.',
+  },
 ];
 
 const PRO_FEATURES = [
@@ -139,7 +143,7 @@ export default function AppGuideScreen({ navigation }) {
             </View>
           ))}
 
-          <Text style={styles.footnote}>Finova v3.0.0 · Your data, your privacy.</Text>
+          <Text style={styles.footnote}>Finova v3.0.6 · Your data, your privacy.</Text>
           <View style={{ height: 40 }} />
         </ScrollView>
         </Animated.View>

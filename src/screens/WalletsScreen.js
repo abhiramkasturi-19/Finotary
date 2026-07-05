@@ -4,7 +4,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  TextInput, Modal, Alert, Animated, Dimensions, BackHandler,
+  TextInput, Modal, Animated, Dimensions, BackHandler, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
@@ -19,8 +19,9 @@ function RenameModal({ visible, wallet, onCancel, onSave, colors }) {
   useEffect(() => { if (visible && wallet) setName(wallet.name); }, [visible, wallet]);
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onCancel}>
-      <View style={cm.backdrop}>
-        <View style={cm.sheet}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
+          <View style={cm.sheet}>
           <View style={cm.handle} />
           <Text style={cm.title}>Rename Wallet</Text>
           <TextInput
@@ -43,7 +44,8 @@ function RenameModal({ visible, wallet, onCancel, onSave, colors }) {
             <Text style={cm.ghostBtnText}>Cancel</Text>
           </TouchableOpacity>
         </View>
-      </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -55,8 +57,9 @@ function NewWalletModal({ visible, onCancel, onCreate }) {
   useEffect(() => { if (!visible) { setName(''); setIcon('💼'); } }, [visible]);
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onCancel}>
-      <View style={cm.backdrop}>
-        <View style={cm.sheet}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
+          <View style={cm.sheet}>
           <View style={cm.handle} />
           <Text style={cm.title}>New Wallet</Text>
           <Text style={cm.subtitle}>Give it a name and pick an icon</Text>
@@ -97,7 +100,8 @@ function NewWalletModal({ visible, onCancel, onCreate }) {
             <Text style={cm.ghostBtnText}>Cancel</Text>
           </TouchableOpacity>
         </View>
-      </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -115,7 +119,9 @@ export default function WalletsScreen({ navigation }) {
   const [newModalOpen,    setNewModalOpen   ] = useState(false);
   const [renameTarget,    setRenameTarget   ] = useState(null);
   const [showArchived,    setShowArchived   ] = useState(false);
-  const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
+  const [walletToDelete,  setWalletToDelete ] = useState(null);
+
+  const slideAnim = useRef(new Animated.Value(SCREEN_H)).current;
 
   useEffect(() => {
     Animated.spring(slideAnim, {
@@ -167,17 +173,14 @@ export default function WalletsScreen({ navigation }) {
 
   const handleDelete = (wallet) => {
     if (wallet.id === 'default') return;
-    const count = txnCount(wallet.id);
-    Alert.alert(
-      `Delete "${wallet.name}"?`,
-      count > 0
-        ? `This wallet has ${count} transaction${count > 1 ? 's' : ''}. They will be moved to Personal.`
-        : 'This wallet is empty.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => deleteWallet(wallet.id) },
-      ]
-    );
+    setWalletToDelete(wallet);
+  };
+
+  const confirmDelete = () => {
+    if (walletToDelete) {
+      deleteWallet(walletToDelete.id);
+      setWalletToDelete(null);
+    }
   };
 
   const handleArchive = (wallet) => {
@@ -186,7 +189,7 @@ export default function WalletsScreen({ navigation }) {
 
   return (
     <SafeAreaView style={s.safe}>
-      <Animated.View style={{flex: 1, transform: [{ translateY: slideAnim }]}}>
+      <Animated.View style={{ flex: 1, transform: [{ translateY: slideAnim }] }}>
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
 
           {/* Header */}
@@ -328,6 +331,7 @@ export default function WalletsScreen({ navigation }) {
         onCancel={() => setNewModalOpen(false)}
         onCreate={handleCreate}
       />
+      {/* Rename Modal */}
       <RenameModal
         visible={!!renameTarget}
         wallet={renameTarget}
@@ -335,6 +339,30 @@ export default function WalletsScreen({ navigation }) {
         onSave={handleRename}
         colors={colors}
       />
+
+      {/* Delete Confirm Modal */}
+      <Modal visible={!!walletToDelete} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setWalletToDelete(null)}>
+        <View style={msgModal.bg}>
+          <View style={msgModal.card}>
+            <Text style={msgModal.icon}>🗑️</Text>
+            <Text style={msgModal.title}>Delete "{walletToDelete?.name}"?</Text>
+            <Text style={msgModal.msg}>
+              {walletToDelete ? (txnCount(walletToDelete.id) > 0
+                ? `This wallet has ${txnCount(walletToDelete.id)} transaction${txnCount(walletToDelete.id) > 1 ? 's' : ''}. They will be moved to Personal.`
+                : 'This wallet is empty.') : ''}
+            </Text>
+            <View style={msgModal.btnRow}>
+              <TouchableOpacity style={[msgModal.btn, msgModal.cancelBtn]} onPress={() => setWalletToDelete(null)} activeOpacity={0.8}>
+                <Text style={[msgModal.btnText, msgModal.cancelBtnText]}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[msgModal.btn, msgModal.destructiveBtn]} onPress={confirmDelete} activeOpacity={0.8}>
+                <Text style={[msgModal.btnText, msgModal.destructiveBtnText]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }
@@ -400,4 +428,19 @@ const cm = StyleSheet.create({
   primaryBtnText: { fontFamily: 'Fungis-Bold', fontSize: 15, color: '#222629' },
   ghostBtn:       { borderRadius: 14, paddingVertical: 14, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)' },
   ghostBtnText:   { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.40)' },
+});
+
+const msgModal = StyleSheet.create({
+  bg:       { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  card:     { backgroundColor: '#2C3020', borderRadius: 24, padding: 28, width: '100%', maxWidth: 340, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.2)' },
+  icon:     { fontSize: 36, marginBottom: 12 },
+  title:    { fontFamily: 'Fungis-Heavy', fontSize: 22, color: '#FFFFFF', marginBottom: 8, textAlign: 'center' },
+  msg:      { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 28 },
+  btnRow:   { flexDirection: 'row', gap: 12, width: '100%' },
+  btn:      { flex: 1, paddingVertical: 14, borderRadius: 100, alignItems: 'center' },
+  btnText:  { fontFamily: 'Fungis-Bold', fontSize: 16 },
+  cancelBtn: { backgroundColor: 'transparent', borderWidth: 1, borderColor: 'rgba(174,183,132,0.3)' },
+  cancelBtnText: { color: 'rgba(255,255,255,0.8)' },
+  destructiveBtn: { backgroundColor: '#B07070' },
+  destructiveBtnText: { color: '#090A09' },
 });

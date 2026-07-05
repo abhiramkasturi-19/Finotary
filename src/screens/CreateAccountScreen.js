@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
 
 const { width, height } = Dimensions.get('window');
@@ -29,59 +30,39 @@ const THEMES = [
 // ── Terms content ────────────────────────────────────────────────────────────
 const TERMS_SECTIONS = [
   {
-    heading: 'Terms of Service',
+    heading: 'Section 1 — Acceptance of Terms',
     body: [
-      'By creating a Finova account, you agree to use the app for personal, non-commercial financial tracking only.',
-      'Finova is provided "as-is" without warranties of any kind. We reserve the right to update these terms at any time.',
-      'Misuse of the app, including attempts to exploit, reverse-engineer, or redistribute it, is strictly prohibited.',
+      'By creating an account and using Finova, you agree to these Terms & Conditions. If you do not agree, do not use the app. These terms may be updated at any time by Abhiram Kasturi.'
     ],
   },
   {
-    heading: 'Data Storage & Responsibility',
+    heading: 'Section 2 — Data Storage & Privacy',
     body: [
-      'All your financial data — transactions, categories, and profile information — is stored entirely on your own device. Finova does not operate any servers, databases, or cloud services.',
-      'We are not responsible for any loss of data caused by device failure, accidental deletion, app uninstallation, OS updates, factory resets, or any other circumstance.',
-      'It is your sole responsibility to back up your data regularly using the Export / Download feature in Settings. We strongly recommend doing this before switching devices or reinstalling the app.',
+      'Finova stores all your personal and financial data entirely on your device using local storage (AsyncStorage). No data is ever transmitted to any server, cloud, or third party. Abhiram Kasturi has no access to your data at any time. You are solely responsible for keeping your backup files safe.'
     ],
   },
   {
-    heading: 'Personal Information',
+    heading: 'Section 3 — Pro Subscription & Payments',
     body: [
-      'Any personal information you enter — including your name, age, and profile picture — is stored locally on your device only and is never transmitted to Finova or any third party.',
-      'You provide this information voluntarily and entirely at your own risk. Finova has no access to, and assumes no liability for, the personal information you choose to enter.',
-      'If you share your device or your exported backup file with others, your personal information may be visible to them. Exercise caution accordingly.',
+      'Finova offers a one-time Pro upgrade priced at ₹199 (Indian Rupees). This is a non-refundable, lifetime unlock. The purchase is processed securely through Google Play. Once purchased, Pro features are permanently unlocked on your account. To restore a previous purchase on a new device, use the Restore Purchase option on the paywall screen.'
     ],
   },
   {
-    heading: 'Privacy Policy',
+    heading: 'Section 4 — User Responsibilities',
     body: [
-      'Finova does not collect, transmit, or sell any user data. There is no analytics tracking, no advertising SDK, and no network calls made by the app.',
-      'Your exported JSON backup file contains all app data in plain text. Keep it secure and do not share it with untrusted parties.',
-      'Finova does not use cookies, device identifiers, or any form of usage profiling.',
+      'You are responsible for maintaining the security of your device and app lock PIN. You are responsible for regularly exporting and storing your backup files. Finova is a personal finance tracking tool only — it is not a banking app, payment app, or financial advisory service.'
     ],
   },
   {
-    heading: 'Enforcement & Consequences',
+    heading: 'Section 5 — Intellectual Property',
     body: [
-      'Violation of any of these terms — including unauthorized use, redistribution, reverse-engineering, or misuse of the app — will result in immediate termination of your right to use Finova.',
-      'Any individual or entity found to be in breach of these terms may be subject to legal action under applicable laws. We reserve the right to pursue all available legal remedies.',
-      'Finova is provided for personal use only. Commercial exploitation, resale, or use in any product or service without explicit written permission from the developer is a direct violation of these terms and will be acted upon accordingly.',
+      'Finova, its design, code, and all assets are the intellectual property of Abhiram Kasturi. You may not copy, reverse engineer, redistribute, or resell any part of this app.'
     ],
   },
   {
-    icon: '⚖️',
-    heading: 'No Liability & Disclaimer',
+    heading: 'Section 6 — Disclaimer',
     body: [
-      'Finova is a personal project provided "as-is" without any warranties. The developer assumes no liability for any financial decisions, data loss, or legal damages resulting from the use of this app.',
-      'This app is not a certified financial tool. By using Finova, you agree that you are solely responsible for your financial tracking, data management, and usage.',
-    ],
-  },
-  {
-    heading: 'Copyright & Intellectual Property',
-    body: [
-      '© 2026 Abhiram Kasturi. All rights reserved. Finova, its name, design, logo, codebase, and all associated assets are the exclusive intellectual property of the developer.',
-      'You may not copy, reproduce, modify, distribute, or create derivative works from any part of Finova — including its UI design, source code, or branding — without prior written consent.',
-      'Unauthorized reproduction or distribution of Finova or any of its components constitutes copyright infringement and will be pursued under applicable intellectual property laws.',
+      'Finova is provided as-is without any warranties. Abhiram Kasturi is not liable for any financial decisions made based on data shown in the app, or for any data loss resulting from device failure, app deletion, or failure to maintain backups.'
     ],
   },
 ];
@@ -124,7 +105,9 @@ function TermsModal({ visible, onClose }) {
           <View style={modal.accentBar} />
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={modal.scrollContent}>
             <Text style={modal.intro}>
-              Please read the following carefully before using Finova. These terms govern your use of the app and explain how your data is handled.
+              Developer name: Abhiram Kasturi{'\n'}
+              App name: Finova{'\n'}
+              Last updated: May 2026
             </Text>
             {TERMS_SECTIONS.map((section, i) => (
               <View key={i} style={modal.section}>
@@ -139,13 +122,31 @@ function TermsModal({ visible, onClose }) {
             ))}
             <View style={modal.footerNote}>
               <Text style={modal.footerText}>
-                Last updated · March 21, 2026 · Finova v3.0.2{'\n'}© 2026 Abhiram Kasturi. All rights reserved.
+                Finova v3.0.2{'\n'}© 2026 Abhiram Kasturi. All rights reserved.
               </Text>
             </View>
             <View style={{ height: 8 }} />
           </ScrollView>
           <TouchableOpacity style={modal.agreeBtn} onPress={onClose} activeOpacity={0.84}>
             <Text style={modal.agreeBtnText}>I Understand</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ── Message Modal ──────────────────────────────────────────────────────────────
+function MessageModal({ visible, title, message, onClose }) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+      <View style={msgModal.bg}>
+        <View style={msgModal.card}>
+          <Text style={msgModal.icon}>⚠️</Text>
+          <Text style={msgModal.title}>{title}</Text>
+          <Text style={msgModal.msg}>{message}</Text>
+          <TouchableOpacity style={msgModal.btn} onPress={onClose} activeOpacity={0.8}>
+            <Text style={msgModal.btnText}>Got it</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -164,13 +165,14 @@ export default function CreateAccountScreen({ navigation }) {
   const [selectedCurrency, setSelectedCurrency] = useState('INR');
   const [agreed,           setAgreed          ] = useState(false);
   const [termsVisible,     setTermsVisible    ] = useState(false);
+  const [msgData,          setMsgData         ] = useState(null); // {title, message}
 
   const canProceed = username.trim().length > 0 && age.trim().length > 0 && agreed;
 
   const pickProfileImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Allow photo access to set a profile picture.');
+      setMsgData({ title: 'Permission needed', message: 'Allow photo access to set a profile picture.' });
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -202,8 +204,9 @@ export default function CreateAccountScreen({ navigation }) {
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
       <ImageBackground source={require('../../assets/background.png')} style={styles.bg} resizeMode="cover">
         <View style={styles.fullOverlay} />
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.kav}>
-          <ScrollView
+        <SafeAreaView style={styles.safe}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.kav}>
+            <ScrollView
             contentContainerStyle={styles.scroll}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -307,10 +310,17 @@ export default function CreateAccountScreen({ navigation }) {
             <View style={{ height: 40 }} />
           </ScrollView>
         </KeyboardAvoidingView>
+        </SafeAreaView>
       </ImageBackground>
 
       {/* ── Modals ── */}
       <TermsModal visible={termsVisible} onClose={() => setTermsVisible(false)} />
+      <MessageModal
+        visible={!!msgData}
+        title={msgData?.title}
+        message={msgData?.message}
+        onClose={() => setMsgData(null)}
+      />
 
     </View>
   );
@@ -321,6 +331,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#222629' },
   bg:   { flex: 1, width, height },
   fullOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.90)' },
+  safe: { flex: 1, paddingTop: -50, paddingBottom: -100 },
   kav:  { flex: 1 },
   scroll: { paddingHorizontal: 28, paddingTop: 56 },
 
@@ -413,4 +424,14 @@ const modal = StyleSheet.create({
   footerText:    { fontFamily: 'Fungis-Regular', fontSize: 11, color: 'rgba(255,255,255,0.25)', textAlign: 'center', letterSpacing: 0.5 },
   agreeBtn:      { marginTop: 12, backgroundColor: '#AEB784', paddingVertical: 15, borderRadius: 14, alignItems: 'center' },
   agreeBtnText:  { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629', letterSpacing: 0.6 },
+});
+
+const msgModal = StyleSheet.create({
+  bg:       { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  card:     { backgroundColor: '#2C3020', borderRadius: 24, padding: 28, width: '100%', maxWidth: 340, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.2)' },
+  icon:     { fontSize: 36, marginBottom: 12 },
+  title:    { fontFamily: 'Fungis-Heavy', fontSize: 22, color: '#FFFFFF', marginBottom: 8, textAlign: 'center' },
+  msg:      { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 28 },
+  btn:      { backgroundColor: '#AEB784', paddingVertical: 14, paddingHorizontal: 32, borderRadius: 100, width: '100%', alignItems: 'center' },
+  btnText:  { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629' },
 });

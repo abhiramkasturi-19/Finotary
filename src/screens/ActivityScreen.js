@@ -95,10 +95,10 @@ function CalendarView({ mode, transactions, currency, onSelectDate, colors }) {
 
   const intensity = (val) => {
     if (!val || val === 0) return colors.surface2;
-    if (val < 200)  return colors.chartGreen + '44';
-    if (val < 500)  return colors.chartGreen + '88';
-    if (val < 1000) return colors.chartGreen + 'BB';
-    return colors.chartGreen;
+    if (val < 500)  return colors.chartGreen + '44'; // light
+    if (val < 2000) return colors.chartGreen + '88'; // medium
+    if (val < 5000) return colors.chartGreen + 'BB'; // bright
+    return colors.chartGreen;                        // max
   };
 
   if (mode === 'daily') {

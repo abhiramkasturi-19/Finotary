@@ -4,7 +4,8 @@
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
-  StyleSheet, Switch, Image, ImageBackground, Dimensions, Modal, Platform, Alert,
+  StyleSheet, Switch, Image, ImageBackground, Dimensions, Modal, Platform,
+  KeyboardAvoidingView, Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,6 +25,9 @@ const CURRENCIES = [
   { sym: '€', label: 'EUR' },
   { sym: '£', label: 'GBP' },
 ];
+
+// ─── Demo Data ───────────────────────────────────────────────────────────────
+import { DEMO_DATA } from '../data/demoData';
 
 // ─── XOR Encryption helpers ──────────────────────────────────────────────────
 function encryptJson(jsonStr, password) {
@@ -168,20 +172,25 @@ function PinSetupModal({ visible, onCancel, onSave }) {
   };
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onCancel}>
-      <View style={cm.backdrop}>
-        <View style={cm.sheet}>
-          <View style={cm.handle} />
-          <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔒</Text></View>
-          <Text style={cm.title}>{step === 1 ? 'Set App PIN' : 'Confirm PIN'}</Text>
-          <Text style={cm.body}>{step === 1 ? 'Enter a 4-digit PIN to lock Finova.' : 'Re-enter your PIN to verify.'}</Text>
-          <TextInput style={cm.pinInput} value={step === 1 ? pin1 : pin2} onChangeText={step === 1 ? setPin1 : setPin2} keyboardType="number-pad" maxLength={4} secureTextEntry placeholder="····" placeholderTextColor="rgba(255,255,255,0.2)" autoFocus />
-          {!!error && <Text style={cm.errorText}>{error}</Text>}
-          <TouchableOpacity style={[cm.primaryBtn, { opacity: (step === 1 ? pin1 : pin2).length === 4 ? 1 : 0.5 }]} onPress={step === 1 ? handleNext : handleConfirm} disabled={(step === 1 ? pin1 : pin2).length !== 4}>
-            <Text style={cm.primaryBtnText}>{step === 1 ? 'Next' : 'Enable Lock'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={cm.ghostBtn} onPress={() => { reset(); onCancel(); }}><Text style={cm.ghostBtnText}>Cancel</Text></TouchableOpacity>
-        </View>
-      </View>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
+          <View style={[cm.sheet, { marginBottom: 40 }]}>
+            <View style={cm.handle} />
+            <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔒</Text></View>
+            <Text style={cm.title}>{step === 1 ? 'Set App PIN' : 'Confirm PIN'}</Text>
+            <Text style={cm.body}>{step === 1 ? 'Enter a 4-digit PIN to lock Finova.' : 'Re-enter your PIN to verify.'}</Text>
+            <TextInput style={[cm.pinInput, { marginBottom: 20 }]} value={step === 1 ? pin1 : pin2} onChangeText={step === 1 ? setPin1 : setPin2} keyboardType="number-pad" maxLength={4} secureTextEntry placeholder="····" placeholderTextColor="rgba(255,255,255,0.2)" autoFocus />
+            {!!error && <Text style={cm.errorText}>{error}</Text>}
+            <TouchableOpacity style={[cm.primaryBtn, { opacity: (step === 1 ? pin1 : pin2).length === 4 ? 1 : 0.5 }]} onPress={step === 1 ? handleNext : handleConfirm} disabled={(step === 1 ? pin1 : pin2).length !== 4}>
+              <Text style={cm.primaryBtnText}>{step === 1 ? 'Next' : 'Enable Lock'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={cm.ghostBtn} onPress={() => { reset(); onCancel(); }}><Text style={cm.ghostBtnText}>Cancel</Text></TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -199,7 +208,8 @@ function PasscodeExportModal({ visible, onCancel, onExport }) {
   };
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onCancel}>
-      <View style={cm.backdrop}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
         <View style={cm.sheet}>
           <View style={cm.handle} />
           <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔐</Text></View>
@@ -213,7 +223,8 @@ function PasscodeExportModal({ visible, onCancel, onExport }) {
           </TouchableOpacity>
           <TouchableOpacity style={cm.ghostBtn} onPress={() => { reset(); onCancel(); }}><Text style={cm.ghostBtnText}>Cancel</Text></TouchableOpacity>
         </View>
-      </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -229,7 +240,8 @@ function DecryptImportModal({ visible, onCancel, onDecrypt }) {
   };
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onCancel}>
-      <View style={cm.backdrop}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
         <View style={cm.sheet}>
           <View style={cm.handle} />
           <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔑</Text></View>
@@ -242,7 +254,8 @@ function DecryptImportModal({ visible, onCancel, onDecrypt }) {
           </TouchableOpacity>
           <TouchableOpacity style={cm.ghostBtn} onPress={() => { setPassword(''); setError(''); onCancel(); }}><Text style={cm.ghostBtnText}>Cancel</Text></TouchableOpacity>
         </View>
-      </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -352,6 +365,7 @@ export default function SettingsScreen({ navigation }) {
     transactions, settings, customCategories,
     wallets, activeWalletId,
     updateSettings, toggleDarkMode, updatePro, importData, dispatch, isPro, state,
+    enterDemo, exitDemo, isDemoMode,
   } = useApp();
 
   const [showDataManager, setShowDataManager] = useState(false);
@@ -494,7 +508,8 @@ export default function SettingsScreen({ navigation }) {
 
   const performLogout = async () => {
     setLogoutModalOpen(false);
-    await AsyncStorage.clear();
+    await AsyncStorage.removeItem('@flo_data');
+    await AsyncStorage.removeItem('hasOnboarded');
     dispatch({ type: 'RESET_APP' });
     navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
   };
@@ -502,6 +517,10 @@ export default function SettingsScreen({ navigation }) {
   const handleDownloadThenLogout = async () => {
     await handleDownload();
     await performLogout();
+  };
+
+  const handleEnterDemo = () => {
+    enterDemo();
   };
 
   const displayName = settings.name || 'Your Name';
@@ -581,6 +600,17 @@ export default function SettingsScreen({ navigation }) {
             </TouchableOpacity>
             {showDataManager && (
               <View style={s.card}>
+                {isDemoMode ? (
+                  <TouchableOpacity style={s.row} onPress={exitDemo} activeOpacity={0.7}>
+                    <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>🚪</Text></View>
+                    <View style={s.rowInfo}><Text style={s.rowLabel}>Exit Demo</Text><Text style={s.rowHint}>Return to your real account</Text></View>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity style={s.row} onPress={handleEnterDemo} activeOpacity={0.7}>
+                    <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>👀</Text></View>
+                    <View style={s.rowInfo}><Text style={s.rowLabel}>Try Demo</Text><Text style={s.rowHint}>Explore with sample data</Text></View>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity style={s.row} onPress={isPro ? handleDownload : () => navigation.navigate('ProPaywall')} activeOpacity={0.7}>
                   <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>📥</Text></View>
                   <View style={s.rowInfo}><Text style={s.rowLabel}>Backup (JSON)</Text><Text style={s.rowHint}>Full account recovery</Text></View>
@@ -632,7 +662,7 @@ export default function SettingsScreen({ navigation }) {
             <View style={s.creditBlock}>
               <Text style={s.creditMadeBy}>crafted by</Text>
               <Text style={s.creditName}>Abhiram Kasturi</Text>
-              <Text style={s.creditFinova}>Finova · v3.0.2</Text>
+              <Text style={s.creditFinova}>Finova · v3.0.6</Text>
             </View>
           </ScrollView>
         </SafeAreaView>

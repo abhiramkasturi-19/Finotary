@@ -4,7 +4,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
-  StyleSheet, Modal, Platform, Animated, Dimensions, BackHandler,
+  StyleSheet, Modal, Platform, Animated, Dimensions, BackHandler, KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
@@ -240,7 +240,8 @@ export default function AddTransactionScreen({ navigation, route }) {
   return (
     <Animated.View style={[sa.root, { transform: [{ translateY: slideAnim }] }]}>
       <SafeAreaView style={s.safe}>
-        <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
           {/* Header */}
           <View style={s.header}>
@@ -317,7 +318,19 @@ export default function AddTransactionScreen({ navigation, route }) {
             {/* + New chip — shows Pro hint if at limit */}
             <TouchableOpacity
               style={[s.catChip, s.catChipAdd]}
-              onPress={() => { setShowNewCatBox(v => !v); }}
+              onPress={() => {
+                if (!isPro && savedCustomCats.length >= 3) {
+                  showError(
+                    '🏷️',
+                    'Category Limit Reached',
+                    'Free accounts can save up to 3 custom categories. Upgrade to Pro for unlimited categories.',
+                    '👑 Upgrade to Pro',
+                    () => { closeError(); navigation.navigate('ProPaywall'); }
+                  );
+                } else {
+                  setShowNewCatBox(v => !v);
+                }
+              }}
             >
               <Text style={s.catAddIcon}>＋</Text>
               <Text style={[s.catLabel, { color: colors.accent }]}>
@@ -429,6 +442,7 @@ export default function AddTransactionScreen({ navigation, route }) {
           </TouchableOpacity>
 
         </ScrollView>
+        </KeyboardAvoidingView>
 
         <ErrorModal
           visible={errorModal.visible}

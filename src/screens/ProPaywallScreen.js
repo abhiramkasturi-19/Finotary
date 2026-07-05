@@ -15,7 +15,6 @@ const FREE_FEATURES = [
   'General tracking',
   'Monthly charts',
   '3 categories',
-  'JSON Backup',
 ];
 
 const PRO_FEATURES = [

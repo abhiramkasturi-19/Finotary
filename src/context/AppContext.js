@@ -1,9 +1,10 @@
 // src/context/AppContext.js
-// Finova v3.0 — Pro system · Wallets · App Lock · CSV/Passcode Export · Search
+// Finova v3.0 — Pro system · Wallets · App Lock · CSV/Passcode Export · Search · Demo Mode
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_COLORS } from '../data/categories';
+import { DEMO_DATA } from '../data/demoData';
 
 const AppContext = createContext();
 
@@ -27,18 +28,20 @@ export const DEFAULT_WALLET = { id: 'default', name: 'Personal', icon: '💳', a
 const initialState = {
   transactions: [],
   settings: {
-    name:             '',
-    age:              '',
-    currency:         '₹',
-    darkMode:         false,
-    profileImage:     '',
-    isPro:            false,
-    appLockEnabled:   false,
-    appLockPin:       '',
+    name:           '',
+    age:            '',
+    currency:       '₹',
+    darkMode:       false,
+    profileImage:   '',
+    isPro:          false,
+    appLockEnabled: false,
+    appLockPin:     '',
   },
   customCategories: { expense: [], income: [] },
   wallets:          [DEFAULT_WALLET],
   activeWalletId:   'default',
+  isDemoMode:       false,
+  _realStateSnapshot: null,
 };
 
 function reducer(state, action) {
@@ -48,7 +51,9 @@ function reducer(state, action) {
       return initialState;
 
     case 'LOAD_DATA': {
-      const loaded   = action.payload.customCategories || { expense: [], income: [] };
+      // Untrusted load from backup file — strip sensitive fields
+      const incoming = action.payload || {};
+      const loaded   = incoming.customCategories || { expense: [], income: [] };
       const migrate  = (list) => {
         if (!list || !Array.isArray(list)) return [];
         return list.map(item =>
@@ -59,21 +64,100 @@ function reducer(state, action) {
       };
       return {
         ...state,
-        ...action.payload,
+        ...incoming,
         settings: {
           ...initialState.settings,
           ...state.settings,
-          ...(action.payload.settings || {}),
-          isPro: state.settings.isPro,
+          ...(incoming.settings || {}),
+          // Security: strip these from backup. Users must earn them on this device.
+          isPro:          state.settings.isPro,
           appLockEnabled: state.settings.appLockEnabled,
-          appLockPin: state.settings.appLockPin,
+          appLockPin:     state.settings.appLockPin,
         },
         customCategories: {
           expense: migrate(loaded.expense),
           income:  migrate(loaded.income),
         },
-        wallets:        action.payload.wallets        || state.wallets        || [DEFAULT_WALLET],
-        activeWalletId: action.payload.activeWalletId || state.activeWalletId || 'default',
+        wallets:        incoming.wallets        || state.wallets        || [DEFAULT_WALLET],
+        activeWalletId: incoming.activeWalletId || state.activeWalletId || 'default',
+        isDemoMode:     false,
+        _realStateSnapshot: null,
+      };
+    }
+
+    case 'LOAD_FROM_STORAGE': {
+      // Trusted load from local storage on startup — preserve everything
+      const incoming = action.payload || {};
+      const loaded   = incoming.customCategories || { expense: [], income: [] };
+      const migrate  = (list) => {
+        if (!list || !Array.isArray(list)) return [];
+        return list.map(item =>
+          typeof item === 'string'
+            ? { name: item, color: DESIGNER_PALETTE[Math.floor(Math.random() * DESIGNER_PALETTE.length)] }
+            : item
+        );
+      };
+      return {
+        ...initialState,
+        ...incoming,
+        settings: {
+          ...initialState.settings,
+          ...(incoming.settings || {}),
+        },
+        customCategories: {
+          expense: migrate(loaded.expense),
+          income:  migrate(loaded.income),
+        },
+        wallets:        incoming.wallets        || [DEFAULT_WALLET],
+        activeWalletId: incoming.activeWalletId || 'default',
+        isDemoMode:     false,
+        _realStateSnapshot: null,
+      };
+    }
+
+    case 'LOAD_DEMO': {
+      const loaded  = action.payload.customCategories || { expense: [], income: [] };
+      const migrate = (list) => {
+        if (!list || !Array.isArray(list)) return [];
+        return list.map(item =>
+          typeof item === 'string'
+            ? { name: item, color: DESIGNER_PALETTE[Math.floor(Math.random() * DESIGNER_PALETTE.length)] }
+            : item
+        );
+      };
+      const snapshot = {
+        transactions:     state.transactions,
+        settings:         { ...state.settings },
+        customCategories: state.customCategories,
+        wallets:          state.wallets,
+        activeWalletId:   state.activeWalletId,
+      };
+      return {
+        ...state,
+        ...action.payload,
+        settings: {
+          ...initialState.settings,
+          ...(action.payload.settings || {}),
+          darkMode: state.settings.darkMode,
+        },
+        customCategories: {
+          expense: migrate(loaded.expense),
+          income:  migrate(loaded.income),
+        },
+        wallets:          action.payload.wallets        || [DEFAULT_WALLET],
+        activeWalletId:   action.payload.activeWalletId || 'default',
+        isDemoMode:       true,
+        _realStateSnapshot: snapshot,
+      };
+    }
+
+    case 'EXIT_DEMO': {
+      const snapshot = state._realStateSnapshot;
+      if (!snapshot) return { ...initialState, isDemoMode: false };
+      return {
+        ...snapshot,
+        isDemoMode:         false,
+        _realStateSnapshot: null,
       };
     }
 
@@ -91,8 +175,16 @@ function reducer(state, action) {
     case 'DELETE_TRANSACTION':
       return { ...state, transactions: state.transactions.filter(t => t.id !== action.payload) };
 
-    case 'UPDATE_SETTINGS':
+    case 'UPDATE_SETTINGS': {
+      // In demo mode: allow darkMode toggle only — block everything else
+      if (state.isDemoMode) {
+        if (Object.keys(action.payload).length === 1 && 'darkMode' in action.payload) {
+          return { ...state, settings: { ...state.settings, darkMode: action.payload.darkMode } };
+        }
+        return state; // block all other settings writes in demo
+      }
       return { ...state, settings: { ...state.settings, ...action.payload } };
+    }
 
     case 'UPDATE_PRO':
       return { ...state, settings: { ...state.settings, isPro: action.payload } };
@@ -168,52 +260,60 @@ function reducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // ── Load persisted data on mount ────────────────────────────────────────────
+  // ── Load persisted data on mount ─────────────────────────────────────────────
   useEffect(() => {
     (async () => {
       try {
         const stored = await AsyncStorage.getItem('@flo_data');
         if (stored) {
-          dispatch({ type: 'LOAD_DATA', payload: JSON.parse(stored) });
+          dispatch({ type: 'LOAD_FROM_STORAGE', payload: JSON.parse(stored) });
         } else {
-          dispatch({ type: 'LOAD_DATA', payload: { transactions: [], settings: initialState.settings } });
+          dispatch({ type: 'LOAD_FROM_STORAGE', payload: { transactions: [], settings: initialState.settings } });
         }
       } catch {
-        dispatch({ type: 'LOAD_DATA', payload: { transactions: [], settings: initialState.settings } });
+        dispatch({ type: 'LOAD_FROM_STORAGE', payload: { transactions: [], settings: initialState.settings } });
       }
     })();
   }, []);
 
-  // ── Persist on every state change ───────────────────────────────────────────
+  // ── Persist on every state change (NEVER in demo mode) ───────────────────────
   useEffect(() => {
+    if (state.isDemoMode) return;
     AsyncStorage.setItem('@flo_data', JSON.stringify(state)).catch(() => {});
   }, [state]);
 
-  // ── Transaction actions ──────────────────────────────────────────────────────
-  const addTransaction    = (txn) => dispatch({
-    type:    'ADD_TRANSACTION',
-    payload: { ...txn, id: Date.now().toString(), walletId: state.activeWalletId },
-  });
-  const editTransaction   = (txn) => dispatch({ type: 'EDIT_TRANSACTION',    payload: txn });
-  const deleteTransaction = (id)  => dispatch({ type: 'DELETE_TRANSACTION',  payload: id });
+  // ── Transaction actions ───────────────────────────────────────────────────────
+  const addTransaction = (txn) => {
+    if (state.isDemoMode) return;
+    dispatch({
+      type:    'ADD_TRANSACTION',
+      payload: { ...txn, id: Date.now().toString(), walletId: state.activeWalletId },
+    });
+  };
+  const editTransaction   = (txn) => { if (state.isDemoMode) return; dispatch({ type: 'EDIT_TRANSACTION',   payload: txn }); };
+  const deleteTransaction = (id)  => { if (state.isDemoMode) return; dispatch({ type: 'DELETE_TRANSACTION', payload: id  }); };
 
-  // ── Settings actions ─────────────────────────────────────────────────────────
-  const updateSettings  = (s)   => dispatch({ type: 'UPDATE_SETTINGS', payload: s });
-  const toggleDarkMode  = ()    => dispatch({ type: 'UPDATE_SETTINGS', payload: { darkMode: !state.settings.darkMode } });
-  const updatePro       = (val) => dispatch({ type: 'UPDATE_PRO',      payload: val });
+  // ── Settings actions ──────────────────────────────────────────────────────────
+  const updateSettings = (s)   => { if (state.isDemoMode) return; dispatch({ type: 'UPDATE_SETTINGS', payload: s   }); };
+  const toggleDarkMode = ()    => { dispatch({ type: 'UPDATE_SETTINGS', payload: { darkMode: !state.settings.darkMode } }); };
+  const updatePro      = (val) => { if (state.isDemoMode) return; dispatch({ type: 'UPDATE_PRO',      payload: val }); };
 
-  // ── Custom category actions — returns 'ok' | 'limit_reached' ────────────────
+  // ── Custom category actions ───────────────────────────────────────────────────
   const addCustomCategory = (type, name) => {
+    if (state.isDemoMode) return 'demo_mode';
     const current = state.customCategories[type] || [];
     if (!state.settings.isPro && current.length >= 3) return 'limit_reached';
     dispatch({ type: 'ADD_CUSTOM_CATEGORY', payload: { type, name } });
     return 'ok';
   };
-  const deleteCustomCategory = (type, name) =>
+  const deleteCustomCategory = (type, name) => {
+    if (state.isDemoMode) return;
     dispatch({ type: 'DELETE_CUSTOM_CATEGORY', payload: { type, name } });
+  };
 
-  // ── Wallet actions — addWallet returns 'ok' | 'requires_pro' ────────────────
+  // ── Wallet actions ────────────────────────────────────────────────────────────
   const addWallet = (name, icon) => {
+    if (state.isDemoMode) return 'demo_mode';
     if (!state.settings.isPro) return 'requires_pro';
     dispatch({
       type:    'ADD_WALLET',
@@ -221,18 +321,20 @@ export function AppProvider({ children }) {
     });
     return 'ok';
   };
-  const renameWallet    = (id, name) => dispatch({ type: 'RENAME_WALLET',    payload: { id, name } });
-  const deleteWallet    = (id) => { if (id !== 'default') dispatch({ type: 'DELETE_WALLET',   payload: { id } }); };
-  const archiveWallet   = (id) => { if (id !== 'default') dispatch({ type: 'ARCHIVE_WALLET',  payload: { id } }); };
-  const unarchiveWallet = (id) =>  dispatch({ type: 'UNARCHIVE_WALLET', payload: { id } });
-  const switchWallet    = (id) =>  dispatch({ type: 'SET_ACTIVE_WALLET', payload: id });
+  const renameWallet    = (id, name) => { if (state.isDemoMode) return; dispatch({ type: 'RENAME_WALLET',    payload: { id, name } }); };
+  const deleteWallet    = (id)       => { if (state.isDemoMode) return; if (id !== 'default') dispatch({ type: 'DELETE_WALLET',   payload: { id } }); };
+  const archiveWallet   = (id)       => { if (state.isDemoMode) return; if (id !== 'default') dispatch({ type: 'ARCHIVE_WALLET',  payload: { id } }); };
+  const unarchiveWallet = (id)       => { if (state.isDemoMode) return; dispatch({ type: 'UNARCHIVE_WALLET', payload: { id } }); };
+  const switchWallet    = (id)       => { if (state.isDemoMode) return; dispatch({ type: 'SET_ACTIVE_WALLET', payload: id }); };
 
-  // ── Import (Login / Upload flows) ────────────────────────────────────────────
+  // ── Import ────────────────────────────────────────────────────────────────────
   const importData = (data) => dispatch({ type: 'LOAD_DATA', payload: data });
 
-  // ── Computed: transactions filtered by active wallet ─────────────────────────
-  // Use `activeTransactions` in all screens that respect wallet context.
-  // Use raw `transactions` only when you explicitly need all wallets (e.g. calendar totals).
+  // ── Demo mode ─────────────────────────────────────────────────────────────────
+  const enterDemo = () => dispatch({ type: 'LOAD_DEMO', payload: DEMO_DATA });
+  const exitDemo  = ()  => dispatch({ type: 'EXIT_DEMO' });
+
+  // ── Computed: wallet-filtered transactions ────────────────────────────────────
   const activeTransactions = state.transactions.filter(t =>
     (t.walletId || 'default') === state.activeWalletId
   );
@@ -242,6 +344,7 @@ export function AppProvider({ children }) {
       ...state,
       activeTransactions,
       isPro: state.settings.isPro,
+      isDemoMode: state.isDemoMode,
       // Transaction
       addTransaction,
       editTransaction,
@@ -262,6 +365,9 @@ export function AppProvider({ children }) {
       switchWallet,
       // Import
       importData,
+      // Demo
+      enterDemo,
+      exitDemo,
       dispatch,
     }}>
       {children}

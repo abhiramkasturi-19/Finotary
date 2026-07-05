@@ -21,7 +21,7 @@
 12. Theme Pattern — Critical Rules
 13. App.js Architecture
 14. Navigation Structure
-15. Component Specifications
+15. Encryption
 16. Spacing & Status Bar Rules
 17. SafeAreaView Warning
 18. All Errors & Fixes
@@ -42,264 +42,204 @@
 **Framework:** React Native via Expo SDK ~55
 **Platform tested:** Android
 **Developer OS:** Windows 11 | PowerShell
-**Project location:** `A:\ProgramLife\APP\Finova\`
-
-### Core Purpose
-Track income and expense transactions, view monthly overviews, analyze spending via donut charts, browse activity with calendar heat maps, trend analysis with line charts, custom categories, multiple wallets, app lock, dark/light themes, onboarding, login via JSON backup, logout.
+**Project location:** A:\ProgramLife\APP\Finova\
 
 ### Current App Version
-**3.0.2 — Pro System (Free + One-Time Pro Unlock, TEST MODE) + App Lock + Multiple Wallets + Transaction Search + CSV Export + Passcode Export + Deep QA Parity**
+**3.0.3 — Pro Persistence Fix + Demo Theme Fix + Demo Exit Symmetry + Keyboard Coverage Fix**
 
-### Delivered Files (v3.0.2)
-All 10 files are complete drop-in replacements.
+### Delivered Files (v3.0.3)
 
-| File | Action | Destination in project |
+| File | Action | Destination |
 |---|---|---|
-| `App.js` | Replace | `App.js` (root) |
-| `AppContext.js` | Replace | `src/context/AppContext.js` |
-| `ProPaywallScreen.js` | Replace | `src/screens/ProPaywallScreen.js` |
-| `WalletsScreen.js` | **New file** | `src/screens/WalletsScreen.js` |
-| `SettingsScreen.js` | Replace | `src/screens/SettingsScreen.js` |
-| `ActivityScreen.js` | Replace | `src/screens/ActivityScreen.js` |
-| `HomeScreen.js` | Replace | `src/screens/HomeScreen.js` |
-| `StatsScreen.js` | Replace | `src/screens/StatsScreen.js` |
-| `AddTransactionScreen.js` | Replace | `src/screens/AddTransactionScreen.js` |
-| `app.json` | Replace | `app.json` (root) |
+| App.js | Replace | App.js (root) |
+| AppContext.js | Replace | src/context/AppContext.js |
+| SettingsScreen.js | Replace | src/screens/SettingsScreen.js |
+| LoginScreen.js | Replace | src/screens/LoginScreen.js |
+| app.json | Replace | app.json (root) |
+
+### Previously Delivered Files (v3.0.3, still current)
+
+| File | Destination |
+|---|---|
+| demoData.js | src/data/demoData.js |
+| ProPaywallScreen.js | src/screens/ProPaywallScreen.js |
+| WalletsScreen.js | src/screens/WalletsScreen.js |
+| ActivityScreen.js | src/screens/ActivityScreen.js |
+| HomeScreen.js | src/screens/HomeScreen.js |
+| StatsScreen.js | src/screens/StatsScreen.js |
+| AddTransactionScreen.js | src/screens/AddTransactionScreen.js |
 
 ### Known Startup Fix
-After dropping in v3.0 files, always run:
 ```bash
 npx expo start --clear
 ```
-The `[runtime not ready]: TypeError: Cannot read property 'EventEmitter' of undefined` error is caused by stale Metro bundle cache — **not a code bug**. `--clear` always fixes it.
 
 ---
 
 ## 2. TECH STACK & DEPENDENCIES
 
-```json
-{
-  "dependencies": {
-    "expo": "~55.0.6",
-    "expo-status-bar": "~55.0.4",
-    "expo-font": "~13.0.3",
-    "expo-splash-screen": "~0.29.22",
-    "expo-image-picker": "*",
-    "expo-document-picker": "*",
-    "expo-file-system": "*",
-    "expo-sharing": "*",
-    "react": "19.2.0",
-    "react-native": "0.83.2",
-    "@react-navigation/native": "^7.1.33",
-    "@react-navigation/bottom-tabs": "^7.15.5",
-    "@react-navigation/native-stack": "^7.14.5",
-    "react-native-screens": "~4.23.0",
-    "react-native-safe-area-context": "~5.6.2",
-    "@react-native-async-storage/async-storage": "2.2.0",
-    "react-native-svg": "15.15.3"
-  }
-}
-```
+expo ~55.0.6, react 19.2.0, react-native 0.83.2, @react-navigation/native ^7.1.33, @react-navigation/native-stack ^7.14.5, react-native-screens ~4.23.0, react-native-safe-area-context ~5.6.2, @react-native-async-storage/async-storage 2.2.0, react-native-svg 15.15.3, expo-image-picker, expo-document-picker, expo-file-system, expo-sharing, expo-font ~13.0.3, expo-splash-screen ~0.29.22
 
-> ⚠️ `@react-navigation/bottom-tabs` installed but NOT used.
-> ⚠️ `expo-image-manipulator` permanently removed. Do NOT add back.
-> ⚠️ `react-native-purchases` (RevenueCat) NOT yet installed. ProPaywallScreen is wired but purchase flow is TEST MODE. Install RevenueCat when Play Store account is ready.
-> ⚠️ `expo-local-authentication` (biometrics) NOT yet installed. App Lock is PIN-only for now.
+> WARNING: expo-image-manipulator permanently removed. Do NOT add back.
+> WARNING: react-native-purchases NOT installed. Purchase flow is TEST MODE.
+> WARNING: expo-local-authentication NOT installed. App Lock is PIN-only.
+
+---
+
+## 3. FILE STRUCTURE
+
+```
+App.js                           ← Root: navigation, AppLockOverlay, DemoBanner, CustomTabBar
+src/context/AppContext.js        ← All state, reducers, actions, demo mode
+src/data/categories.js           ← EXPENSE_CATEGORIES, INCOME_CATEGORIES, getCat()
+src/data/demoData.js             ← DEMO_DATA export (2 years sample, expanded to Dec 2026)
+src/screens/WelcomeScreen.js
+src/screens/CreateAccountScreen.js
+src/screens/DataInfoScreen.js
+src/screens/LoginScreen.js
+src/screens/AppGuideScreen.js
+src/screens/HomeScreen.js
+src/screens/ActivityScreen.js
+src/screens/StatsScreen.js
+src/screens/SettingsScreen.js
+src/screens/AddTransactionScreen.js
+src/screens/ProPaywallScreen.js
+src/screens/WalletsScreen.js
+src/components/Icon.js
+src/theme/theme.js
+```
 
 ---
 
 ## 5. COLOR PALETTES
 
-### Light Theme — "Parchment & Sage"
-```js
-bg:'#F6F0D7', surface:'#FDFAF0', surface2:'#EDE8CE', accent:'#9CAB84',
-accentLight:'#7A8B68', accentDark:'#89986D', textPrimary:'#2C3320', textMuted:'#7A8B68',
-wineRed:'#8B3A3A', expense:'#8B3A3A', income:'#4A6741', border:'#DDD9C2'
-```
+### Light Theme — Parchment & Sage
+bg:#F6F0D7, surface:#FDFAF0, surface2:#EDE8CE, accent:#9CAB84, accentLight:#7A8B68, accentDark:#89986D, textPrimary:#2C3320, textMuted:#7A8B68, wineRed:#8B3A3A, expense:#8B3A3A, income:#4A6741, border:#DDD9C2
 
-### Dark Theme — "Designer Modern"
-```js
-bg:'#222629', surface:'#474B47', surface2:'#6B6E70', accent:'#AEB784',
-accentLight:'#AEB784', accentDark:'#61892F', textPrimary:'#FFFFFF', textMuted:'#6B6E70',
-wineRed:'#B07070', expense:'#B07070', income:'#AEB784', border:'rgba(107,110,112,0.3)'
-```
+### Dark Theme — Designer Modern
+bg:#222629, surface:#474B47, surface2:#6B6E70, accent:#AEB784, accentLight:#AEB784, accentDark:#61892F, textPrimary:#FFFFFF, textMuted:#6B6E70, wineRed:#B07070, expense:#B07070, income:#AEB784, border:rgba(107,110,112,0.3)
 
-### Pro Paywall / App Lock Screen (fixed dark — not theme-dependent)
-```js
-bg: '#1A1D1A'   // slightly deeper than app bg — gives paywall its own identity
-```
-
-### Onboarding / Login (always dark)
-Overlay: `rgba(0,0,0,0.90)` | Accent: `#AEB784` | Text: `#FFFFFF`
-
-### Modal / Bottom Sheet
-Sheet: `#2C3020` | Border: `rgba(174,183,132,0.18)` | Handle: `rgba(174,183,132,0.35)`
+### Fixed Screens (not theme-dependent)
+- ProPaywall bg: #090A09 (deep black — NOT #1A1D1A)
+- AppLock bg: #1A1D1A
+- Onboarding overlay: rgba(0,0,0,0.90)
+- Modal sheet: #2C3020
+- Demo banner: backgroundColor #AEB784, button bg #222629
 
 ---
 
 ## 6. FONT SYSTEM — FUNGIS
 
-```js
-'Fungis-Regular': require('./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Regular.ttf'),
-'Fungis-Bold':    require('./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Bold.ttf'),
-'Fungis-Heavy':   require('./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Heavy.ttf'),
-```
-**Never `FUNGIS-*`** — silent fallback. Always `Fungis-*`.
+Always Fungis-Regular, Fungis-Bold, Fungis-Heavy. NEVER FUNGIS-* (causes silent fallback to system font).
 
 ---
 
 ## 9. CATEGORIES REFERENCE
 
-Base expense: Food🍜`#ECA72C` | Petrol⛽`#B10F2E` | Shopping🛍️`#9984D4` | Books📚`#EDE580` | Transport🚇`#A3BFA8` | Health💊`#A3BFA8` | Bills⚡`#3993DD` | Others📦`#221E22`
+### Expense (src/data/categories.js)
+food #ECA72C | petrol #B10F2E | shopping #9984D4 | books #EDE580 | transport #B3C0A4 | health #98CE00 | bills #3993DD | others #221E22
 
-Custom: 25-colour `DESIGNER_PALETTE` in AppContext. **Free users: max 3 custom categories. Pro: unlimited.**
+### Income (src/data/categories.js)
+salary #A3BFA8 | freelance #9984D4 | gift #ECA72C | others #3993DD
+
+CRITICAL: Transaction category field MUST be lowercase id (food, bills, transport) — NEVER title case label (Food, Bills). getCat() matches by id. Title case causes fallback to others → one colour donut, wrong emoji.
+
+Custom: 25-colour DESIGNER_PALETTE in AppContext. Free: max 3. Pro: unlimited.
 
 ---
 
 ## 10. SCREEN SPECIFICATIONS
 
-### 10.1 WelcomeScreen *(v2.6)*
-Root screen. "Get Started" → CreateAccount. "Log In" → Login. No back button.
+### 10.1 WelcomeScreen
+Root. Get Started → CreateAccount. Log In → Login. No back button.
 
-### 10.2 LoginScreen *(v2.6)*
-JSON backup upload → validate → `importData()` → `hasOnboarded:'true'` → reset to Main.
-Also handles encrypted `.enc` files — auto-detects `FINOVA_ENC:` prefix and opens DecryptImportModal.
+### 10.2 LoginScreen *(updated v3.0.6)*
+JSON backup → validate → importData() → hasOnboarded:'true' → reset to Main.
+Auto-detects FINOVA_ENC: or FINOVA_ENC2: prefix → DecryptImportModal.
 
-### 10.3 CreateAccountScreen *(v2.8)*
-Profile pic (`allowsEditing:true`), username, age, theme chip, currency chip, terms checkbox.
-Terms row: one line, link opens TermsModal (6 sections). "I Understand" does NOT auto-tick.
-Layout: `SafeAreaView paddingTop:-50 paddingBottom:-100`.
+**DecryptImportModal keyboard fix (v3.0.6):**
+The `DecryptImportModal` password `TextInput` is wrapped in `KeyboardAvoidingView` with `behavior={Platform.OS === 'ios' ? 'padding' : 'height'}`. Outer container uses `justifyContent:'flex-end'` and `marginBottom:40` so the input floats above the keyboard. `softwareKeyboardLayoutMode:'pan'` in `app.json` provides the base Android fix.
 
-### 10.4 DataInfoScreen *(v2.5)*
-"Enter Finova →" → `hasOnboarded:'true'` → reset to Main.
+### 10.3 CreateAccountScreen
+Profile pic (allowsEditing:true, aspect:[1,1], NO ImageManipulator), username, age, theme chip, currency chip, terms checkbox.
+TermsModal: 6 sections, "Last updated March 2026". I Understand does NOT auto-tick.
+SafeAreaView paddingTop:-50 paddingBottom:-100. Always dark.
 
-### 10.5 AppGuideScreen *(v2.9)*
-`panDownManual`. Own internal `Animated.View` slide. `stiffness:240`. `goBack()` immediately on close.
-Footnote: `Finova v3.0.0 · All data stored locally.`
+### 10.4 DataInfoScreen
+"Enter Finova →" → hasOnboarded:'true' → reset to Main.
 
-### 10.6 SettingsScreen *(v3.0)*
+### 10.5 AppGuideScreen
+panDownManual. Internal Animated.View spring slide-up. stiffness:240, damping:26. Immediate goBack() on close.
+
+### 10.6 SettingsScreen *(updated v3.0.6)*
 **File:** `src/screens/SettingsScreen.js`
 
 Profile card view mode shows **👑 PRO badge** if `isPro`. Active wallet name shown below meta line (if not default wallet).
 
 **PREFERENCES section:**
 - Dark Mode toggle (unchanged)
-- App Lock toggle — Pro-gated. If not Pro → navigates to ProPaywall. If Pro + toggled ON → opens `PinSetupModal` (two-step PIN entry). If toggled OFF → clears `appLockEnabled` + `appLockPin`.
+- App Lock toggle — Pro-gated. If not Pro → navigates to ProPaywall. If Pro + toggled ON → opens `PinSetupModal`.
+
+**PinSetupModal keyboard fix (v3.0.6):**
+Modal content is vertically centred (`justifyContent:'center'`). Hidden autofocus `TextInput` for PIN capture uses `style={{ position:'absolute', opacity:0, height:0 }}`. Modal inner container has `paddingBottom:300` to ensure scroll room when keyboard opens. `softwareKeyboardLayoutMode:'pan'` in `app.json` handles the base Android behaviour.
 
 **DATA MANAGEMENT section (collapsible):**
+- **Try Demo / Exit Demo** — same row, conditional on `isDemoMode` (v3.0.6):
+  - When `isDemoMode === false`: shows "Try Demo" (👀) row — loads `DEMO_DATA`
+  - When `isDemoMode === true`: shows "Exit Demo" (🚪) row — calls `exitDemo()`
+  - The `DemoBanner` Exit button in App.js remains as a persistent secondary exit available from any screen
 - Download Data — Pro-gated (JSON backup)
-- CSV Export — **NEW Pro feature** — exports all transactions to `.csv` via expo-sharing
-- Passcode Export — **NEW Pro feature** — XOR-encrypts backup with password → `.enc` file
-- Upload Data — always available. Auto-detects `.enc` (encrypted) files, opens `DecryptImportModal`. Handles plain JSON as before.
+- CSV Export — Pro feature
+- Passcode Export — Pro feature
+- Upload Data — always available
 - Clear All Data — always available. Custom modal confirm.
 
 **APP section:**
-- Version: `3.0.0`
 - Wallets row → navigates to `WalletsScreen`
 - App Guide row → navigates to `AppGuide`
-- "👑 Upgrade to Pro — ₹49 →" row — visible only to free users
+- "👑 Upgrade to Pro" row — visible only to free users
 
-**executeClear** preserves: `name`, `age`, `currency`, `darkMode`, `profileImage`, `isPro`, `appLockEnabled`, `appLockPin`, `wallets`, `activeWalletId`, `customCategories`.
-
-**Layout/Styling:**
-- ScrollView `contentContainerStyle` uses `paddingBottom: 100` to guarantee the bottom list items clear the custom tab bar completely.
+**executeClear** preserves: `name`, `age`, `currency`, `darkMode`, `profileImage`, `isPro`, `appLockEnabled`, `appLockPin`, `wallets`, `activeWalletId`, `customCategories`, `hasOnboarded`.
+Uses `AsyncStorage.setItem` — **never** `AsyncStorage.clear()`.
 
 **Logout Options:**
-The `LogoutModal` renders 3 explicit paths (Log Out + Download, Log Out without Download). Free users interacting with the Download option are aggressively routed through to the ProPaywall.
+`LogoutModal` renders 2 explicit paths. Free users interacting with the Download option are routed to ProPaywall.
 
 ### 10.7 AddTransactionScreen *(v3.0)*
-**File:** `src/screens/AddTransactionScreen.js`
-
-**Custom category gate:** `handleAddNewCat` checks return value of `addCustomCategory`. If `'limit_reached'` → shows `ErrorModal` with "👑 Upgrade to Pro" action button → navigates to ProPaywall.
-
-**"+ New" chip:** shows label `'Pro'` (instead of `'New'`) when free user has hit the 3-category limit.
-
-`panDownManual`. Own `Animated.View` slide. Immediate `goBack()` on close. `maxLength={12}` on amount. `paddingBottom:120`.
-
-Wallet tagging is automatic — `addTransaction()` in AppContext always tags with `state.activeWalletId`. No wallet selector UI needed in this screen.
+panDownManual. Own Animated.View spring slide-up. stiffness:240. Immediate goBack() on close. maxLength={12}. paddingBottom:120. **No KAV — Rule 26.**
+Custom category gate: checks return value of addCustomCategory. 'limit_reached' → ErrorModal with ProPaywall action. 'demo_mode' → silently ignored.
+Wallet tagging automatic — addTransaction() tags with activeWalletId.
+Date validation: validates .getDate/.getMonth/.getFullYear match to catch Feb 31 rollover.
 
 ### 10.8 HomeScreen *(v3.0)*
-**File:** `src/screens/HomeScreen.js`
-
-Uses `activeTransactions` (wallet-filtered) for all calculations — month totals, donut chart, recent 5.
-
-**Wallet card changes:**
-- Wallet name pill shown on the card top row (taps → WalletsScreen)
-- Avatar tap also navigates to WalletsScreen
+Uses `activeTransactions` (wallet-filtered). Wallet name pill on card top row (→ WalletsScreen). Avatar tap → WalletsScreen. Balance Text: `adjustsFontSizeToFit` + `numberOfLines={1}`.
 
 ### 10.9 ActivityScreen *(v3.0)*
-**File:** `src/screens/ActivityScreen.js`
-
-Uses `activeTransactions` for period filter, donut chart, total, and transaction list.
-Calendar heat-map also uses `activeTransactions` (shows heat for active wallet only).
-
-**Transaction Search (NEW — Pro):**
-- Search icon (`🔍`) beside "Recent Transactions" section title
-- Free users: search icon has `🔒` badge — tap navigates to ProPaywall
-- Pro users: tap toggles search bar open/closed
-- Search bar filters `displayTxns` by: note, amount (as string), category label
-- `setSearchOpen(false); setSearchQuery('')` on close
+Uses `activeTransactions`. Calendar heat-map wallet-aware. Heat intensity thresholds: <500 light, <2000 medium, <5000 bright, ≥5000 full. Transaction Search Pro-gated.
 
 ### 10.10 StatsScreen *(v3.0)*
-**File:** `src/screens/StatsScreen.js`
+Uses `activeTransactions`. Filters: Week/Month/3 Month/6 Month/Year. Month view label step: n <= 31 ? 2 : Math.max(1, Math.ceil(n/10)).
 
-Uses `activeTransactions` throughout — `filtered`, `catMap`, `buildPoints`. Wallet switch on HomeScreen automatically makes Stats reflect the active wallet.
+### 10.11 ProPaywallScreen *(v3.0.2)*
+Background: #090A09. panDownManual. Own Animated.View spring. stiffness:240. TEST MODE: 900ms delay → updatePro(true) → goBack(). Immediate goBack() on close.
 
-Filters: `['Week','Month','3 Month','6 Month','Year']`
+### 10.12 WalletsScreen *(v3.0.3)*
+**panDownManual — NO internal Animated.View.** The preset handles all animation. Adding one causes double-animation conflict. Immediate goBack() on close.
+walletToDelete and setWalletToDelete MUST be useState(null). Default wallet (id:'default') cannot be deleted or archived. Delete migrates transactions to 'default'. Pro-gated wallet creation.
 
-### 10.11 ProPaywallScreen *(v3.0.2 — visually redesigned)*
-**File:** `src/screens/ProPaywallScreen.js`
+### 10.13 Demo Mode *(v3.0.6 — theme + exit fixes)*
+Activated: Settings → DATA MANAGEMENT → Try Demo.
+Loads DEMO_DATA from src/data/demoData.js. isDemoMode:true. _realStateSnapshot saved. ALL writes silently blocked EXCEPT darkMode toggle. AsyncStorage NEVER written.
 
-**Background:** `#090A09` (deep black premium layout).
+**Theme in demo (v3.0.6 fix):** Demo loads with the user's real `darkMode` preference, not `DEMO_DATA.settings.darkMode`. `LOAD_DEMO` reducer explicitly copies `state.settings.darkMode` into the demo state. `toggleDarkMode()` / `UPDATE_SETTINGS` with only `darkMode` key is unblocked in demo — all other settings writes remain blocked.
 
-**Layout:**
-```
-✕ close button (top right, rounded ghost button)
-Huge 'finova' text logo (Heavy 64px, gold)
-Tagline (Regular 14px)
+**Exit options (v3.0.6):**
+1. DemoBanner "Exit" button — always visible at top of every screen during demo
+2. Settings → DATA MANAGEMENT → "Exit Demo" row — same location as "Try Demo"
 
-Vertical column containing Two Stacked Cards:
-[Free Card]
-  ₹0 forever
-  4 Base Features
-  "Current" marker
-
-[Pro Card] (Gold accented)
-  ₹49 one-time limited offer + "LIMITED TIME" badge
-  5 Pro Features
-  "Unlock Pro" CTA
-
-"Restore Purchase" (Link)
-Legal footer
-```
-
-**Purchase flow — TEST MODE (current):**
-```js
-// 900ms fake delay → updatePro(true) → navigation.goBack()
-setTimeout(() => { updatePro(true); navigation.goBack(); }, 900);
-```
-**When RevenueCat is ready:** replace `setTimeout` block with RevenueCat `purchasePackage` call.
-
-`panDownManual`. Own `Animated.View` slide. Immediate `goBack()` on close.
-
-### 10.12 WalletsScreen *(NEW — v3.0)*
-**File:** `src/screens/WalletsScreen.js`
-
-Full wallet manager. Uses `slideRight` transition (not panDown).
-
-**Features:**
-- Lists active (non-archived) wallets with transaction count
-- Active wallet highlighted with sage tint + "Active" pill
-- Switch wallet → `switchWallet(id)` + `navigation.goBack()` (all screens reflect new wallet)
-- Rename wallet (ModalSheet, `RenameModal`)
-- Archive wallet (moves to archived section, switches to default if active)
-- Delete wallet with confirmation — migrates transactions to Personal
-- Create new wallet (Pro-gated) — `NewWalletModal` with name + icon picker (15 emoji icons)
-- Default (`id: 'default'`) wallet cannot be deleted or archived
-- Archived section collapsible, shows unarchive (♻️) + delete options
-- Active context banner shown when not on default wallet — with "Back to Personal" shortcut
-
-**Pro gate on create:** if `!isPro` → `setNewModalOpen(false)` → `navigation.navigate('ProPaywall')`
+Exit restores _realStateSnapshot (real theme, isPro, wallets, settings, transactions).
+AppLock does NOT trigger in demo. DemoBanner height: DEMO_BANNER_HEIGHT = 74.
+AppLockOverlay wraps {children} in View with marginTop: isDemoMode ? DEMO_BANNER_HEIGHT : 0.
 
 ---
 
@@ -307,83 +247,125 @@ Full wallet manager. Uses `slideRight` transition (not panDown).
 
 **File:** `src/context/AppContext.js` | **Hook:** `useApp()`
 
-### State Shape *(v3.0)*
+### State Shape *(v3.0.2)*
 ```js
 {
-  transactions: [],         // all transactions across all wallets
+  transactions: [],
   settings: {
     name:           '',
     age:            '',
     currency:       '₹',
     darkMode:       false,
-    profileImage:   '',     // base64 data URI
-    isPro:          false,  // false = free, true = pro unlocked
-    appLockEnabled: false,  // App Lock toggle state
-    appLockPin:     '',     // 4-digit PIN string
+    profileImage:   '',
+    isPro:          false,
+    appLockEnabled: false,
+    appLockPin:     '',
   },
   customCategories: { expense: [], income: [] },
-  wallets: [
-    { id: 'default', name: 'Personal', icon: '💳', archived: false }
-  ],
-  activeWalletId: 'default',
+  wallets: [{ id: 'default', name: 'Personal', icon: '💳', archived: false }],
+  activeWalletId:     'default',
+  isDemoMode:         false,
+  _realStateSnapshot: null,
 }
 ```
 
-### Computed Value
+### Persist useEffect — CRITICAL RULE (v3.0.6)
 ```js
-// Exposed in context — use this in all screens for wallet-aware display
-activeTransactions = transactions.filter(t =>
-  (t.walletId || 'default') === activeWalletId
-)
+useEffect(() => {
+  // NEVER persist during demo mode — demo data must never overwrite real user data
+  if (state.isDemoMode) return;
+  AsyncStorage.setItem('@flo_data', JSON.stringify(state)).catch(() => {});
+}, [state]);
 ```
-> Use `activeTransactions` in HomeScreen, ActivityScreen, StatsScreen.
-> Use raw `transactions` only for cross-wallet aggregations (not currently needed).
+The `isDemoMode` guard is non-negotiable. Without it, demo state overwrites real Pro status and transactions.
 
-### Key Actions *(v3.0)*
+### LOAD_DEMO reducer — CRITICAL RULE (v3.0.6)
+```js
+case 'LOAD_DEMO': {
+  const snapshot = {
+    transactions:     state.transactions,
+    settings:         { ...state.settings },   // includes isPro, darkMode, everything
+    customCategories: state.customCategories,
+    wallets:          state.wallets,
+    activeWalletId:   state.activeWalletId,
+  };
+  return {
+    ...action.payload,              // DEMO_DATA
+    settings: {
+      ...action.payload.settings,
+      darkMode: state.settings.darkMode,  // preserve user's real theme
+    },
+    isDemoMode:         true,
+    _realStateSnapshot: snapshot,
+  };
+}
+```
+
+### EXIT_DEMO reducer — CRITICAL RULE (v3.0.6)
+```js
+case 'EXIT_DEMO': {
+  const snapshot = state._realStateSnapshot;
+  if (!snapshot) return { ...initialState, isDemoMode: false };
+  return {
+    ...snapshot,          // full real state restoration
+    isDemoMode:         false,
+    _realStateSnapshot: null,
+  };
+}
+```
+NEVER return initialState if snapshot exists — this wipes real Pro status.
+
+### UPDATE_SETTINGS in demo — darkMode exception (v3.0.6)
+```js
+case 'UPDATE_SETTINGS': {
+  if (state.isDemoMode) {
+    // Allow darkMode toggle only — block everything else
+    if (Object.keys(action.payload).length === 1 && 'darkMode' in action.payload) {
+      return { ...state, settings: { ...state.settings, darkMode: action.payload.darkMode } };
+    }
+    return state;
+  }
+  return { ...state, settings: { ...state.settings, ...action.payload } };
+}
+```
+
+### LOAD_DATA — isPro security rule
+`LOAD_DATA` (used by importData / backup restore) MUST strip `isPro`, `appLockEnabled`, `appLockPin` from the incoming payload to prevent privilege injection via backup file. It reads these correctly from `@flo_data` on startup — the stripping applies only to the importData() flow.
+
+### Key Actions *(v3.0.2)*
 | Method | Purpose | Notes |
 |---|---|---|
-| `addTransaction(txn)` | Prepends with `id` + `walletId:activeWalletId` | Auto-tags active wallet |
-| `editTransaction(txn)` | `map()` replaces by id | |
-| `deleteTransaction(id)` | Filter by id | |
-| `updateSettings(partial)` | Merges settings | |
-| `updatePro(bool)` | Sets `settings.isPro` | |
-| `toggleDarkMode()` | Shorthand | |
-| `addCustomCategory(type, name)` | Returns `'limit_reached'` or `'ok'` | Free limit: 3 |
-| `deleteCustomCategory(type, name)` | Filter | |
-| `addWallet(name, icon)` | Returns `'requires_pro'` or `'ok'` | Pro-gated |
-| `renameWallet(id, name)` | Updates wallet name | |
+| `addTransaction(txn)` | Prepends with id + walletId | Blocked in demo |
+| `editTransaction(txn)` | map() replaces by id | Blocked in demo |
+| `deleteTransaction(id)` | Filter by id | Blocked in demo |
+| `updateSettings(partial)` | Merges settings | Blocked in demo EXCEPT darkMode |
+| `updatePro(bool)` | Sets settings.isPro | Blocked in demo |
+| `toggleDarkMode()` | Shorthand | Allowed in demo (v3.0.6) |
+| `addCustomCategory(type, name)` | Returns 'limit_reached', 'ok', 'demo_mode' | Free limit: 3 |
+| `deleteCustomCategory(type, name)` | Filter | Blocked in demo |
+| `addWallet(name, icon)` | Returns 'requires_pro', 'ok', 'demo_mode' | Pro-gated |
+| `renameWallet(id, name)` | Updates wallet name | Blocked in demo |
 | `deleteWallet(id)` | Removes wallet, migrates txns to 'default' | Cannot delete 'default' |
-| `archiveWallet(id)` | Sets archived:true, switches to default if active | Cannot archive 'default' |
-| `unarchiveWallet(id)` | Sets archived:false | |
-| `switchWallet(id)` | Updates `activeWalletId` | |
-| `importData(data)` | Full LOAD_DATA replace | |
+| `archiveWallet(id)` | Sets archived:true | Cannot archive 'default' |
+| `unarchiveWallet(id)` | Sets archived:false | Blocked in demo |
+| `switchWallet(id)` | Updates activeWalletId | Blocked in demo |
+| `importData(data)` | Full LOAD_DATA replace | strips isPro/appLock |
+| `enterDemo()` | Dispatches LOAD_DEMO | |
+| `exitDemo()` | Dispatches EXIT_DEMO, restores snapshot | |
 
-### Transaction shape *(v3.0)*
-```js
-{
-  id:             '1711000000000',   // Date.now().toString()
-  type:           'expense' | 'income',
-  amount:         1234.5,
-  category:       'food',            // base category id, or 'others'
-  customCategory: '',                // non-empty only when category='others'
-  date:           '2026-03-20T...',  // ISO string
-  note:           '',
-  walletId:       'default',         // NEW in v3.0 — auto-tagged by addTransaction
-}
-```
-> Old transactions without `walletId` default to `'default'` via `(t.walletId || 'default')` throughout.
-
-### isPro & App Lock persistence
+### isPro & App Lock persistence *(clarified v3.0.6)*
 - `isPro`, `appLockEnabled`, `appLockPin` are in `settings` → persisted in `@flo_data`
-- Survive: `executeClear` ✅, backup restore ✅ (if backup was from v3.0)
-- Cleared by: `performLogout` only (resets to defaults)
+- Survive: `executeClear` ✅, app background/foreground ✅, app restart ✅
+- **Persist useEffect skips when `isDemoMode:true`** — real state (including isPro) remains unchanged in storage while demo runs
+- Cleared by: `performLogout` only
 
 ### Context value
 ```js
 value={{
   ...state,
-  activeTransactions,          // computed wallet-filtered list
-  isPro: state.settings.isPro, // boolean shortcut
+  activeTransactions,
+  isPro: state.settings.isPro,
+  isDemoMode: state.isDemoMode,
   // all actions...
 }}
 ```
@@ -392,7 +374,17 @@ value={{
 
 ## 13. APP.JS ARCHITECTURE
 
-### Transition Presets *(v3.0 — unchanged from v2.9 except Wallets)*
+### Components in App.js
+| Component | Purpose |
+|---|---|
+| `DemoBanner` | Green bar, position:absolute, zIndex:999. "👀 Demo Mode — read only" + Exit button. Height = DEMO_BANNER_HEIGHT (74px). Renders only when isDemoMode:true. |
+| `AppLockOverlay` | Wraps entire NavigationContainer. AppState watcher. PIN modal bg #1A1D1A. Skips lock when isDemoMode:true. Wraps {children} in View with marginTop: isDemoMode ? DEMO_BANNER_HEIGHT : 0. |
+| `CustomTabBar` | Custom bottom tab bar. elevation:100. Inactive: display:'none'. |
+| `MainTabs` | Custom tab switcher with directional spring animation. |
+| `AuthFlow` | Onboarding screens with spring slide animation. |
+| `BrandedSplash` | 2s branded splash on every cold launch. Holds 1.4s, fades + scales out 0.6s. |
+
+### Transition Presets *(v3.0)*
 ```js
 const DARK          = { contentStyle: { backgroundColor: '#111' } };
 const panDownManual = { presentation:'transparentModal', animation:'none', ...DARK };
@@ -401,45 +393,29 @@ const fadeIn        = { animation:'fade', animationDuration:280, ...DARK };
 const noAnim        = { animation:'none', ...DARK };
 ```
 
-### Screen → Preset mapping *(v3.0)*
-| Screen | Preset | Notes |
+### Screen → Preset mapping *(v3.0.3 — current)*
+| Screen | Preset | Internal animation |
 |---|---|---|
-| Welcome (AuthFlow) | noAnim | Root |
-| Main (MainTabs) | fadeIn | Custom tabs |
-| AddTransaction | panDownManual | Own internal Animated.View slide |
-| AppGuide | panDownManual | Own internal Animated.View slide |
-| ProPaywall | panDownManual | Own internal Animated.View slide |
-| **Wallets** | **slideRight** | **NEW — standard horizontal slide** |
+| Welcome (AuthFlow) | noAnim | spring (internal) |
+| Main (MainTabs) | fadeIn | directional spring (internal) |
+| AddTransaction | panDownManual | spring slide-up, stiffness:240 |
+| AppGuide | panDownManual | spring slide-up, stiffness:240 |
+| ProPaywall | panDownManual | spring slide-up, stiffness:240 |
+| Wallets | panDownManual | **NONE** — preset handles all animation |
 
-### Stack Structure *(v3.0)*
+### DEMO_BANNER_HEIGHT
+```js
+export const DEMO_BANNER_HEIGHT = 74;
 ```
-[onboarded]
-  Main(fadeIn)
-  Welcome(noAnim)
-  AddTransaction(panDownManual)
-  AppGuide(panDownManual)
-  ProPaywall(panDownManual)
-  Wallets(slideRight)          ← NEW
+Exported from App.js. Single source of truth. AppLockOverlay applies the offset. Never add per-screen padding to compensate.
 
-[not onboarded]
-  Welcome(noAnim)
-  Main(fadeIn)
-  AddTransaction(panDownManual)
-  AppGuide(panDownManual)
-  ProPaywall(panDownManual)
-  Wallets(slideRight)          ← NEW
+### AppLock AppState handler — demo guard
+```js
+// AppLockOverlay AppState change handler
+if (isDemoMode) return;   // never trigger lock during demo
+if (!settings.appLockEnabled || !settings.appLockPin) return;
+setLocked(true);
 ```
-
-> `sharedScreens` pattern used to avoid duplicating AddTransaction, AppGuide, ProPaywall, Wallets across both branches. Both branches share the same 4 screens via a JSX fragment defined once.
-
-### App Lock Overlay *(NEW — v3.0)*
-`AppLockOverlay` component wraps the entire `NavigationContainer` inside `AppProvider`. It:
-- Watches `AppState` — triggers on `background/inactive → active` transitions
-- Shows a full-screen `Modal` (transparent:false) with PIN pad when `settings.appLockEnabled && settings.appLockPin`
-- 4-dot indicator, 12-key numpad (1–9, empty, 0, ⌫)
-- Wrong PIN → shake animation (`Animated.sequence` translateX) + clear
-- Correct PIN → `setLocked(false)`
-- Background: `#1A1D1A` (same as paywall — dark identity screen)
 
 ---
 
@@ -448,67 +424,34 @@ const noAnim        = { animation:'none', ...DARK };
 ### Key flows *(v3.0)*
 ```
 Free user hits custom cat limit:
-  AddTransactionScreen "+ New" chip → addCustomCategory returns 'limit_reached'
-  → ErrorModal with "👑 Upgrade to Pro" action → navigation.navigate('ProPaywall')
-  → user buys → updatePro(true) → goBack() → now unlimited
+  AddTransactionScreen → 'limit_reached' → ErrorModal → ProPaywall
 
-Free user taps search icon in Activity:
-  → navigation.navigate('ProPaywall')
-  → user buys → goBack() → search now works
+Free user taps search in Activity:
+  → ProPaywall
 
-Free user taps App Lock toggle in Settings:
-  → navigation.navigate('ProPaywall')
-  → user buys → goBack() → toggle opens PinSetupModal
+Free user taps App Lock toggle:
+  → ProPaywall
 
-Free user taps New Wallet in WalletsScreen:
-  → navigation.navigate('ProPaywall')
-  → user buys → goBack() → new wallet modal opens
-
-Free user taps Download/CSV/Passcode Export in Settings:
-  → navigation.navigate('ProPaywall')
-
-Free user taps "Upgrade to Pro" in Settings App section:
-  → navigation.navigate('ProPaywall')
+Free user taps New Wallet:
+  → ProPaywall
 
 Wallet switch:
-  WalletsScreen wallet row tap → switchWallet(id) → navigation.goBack()
-  All screens now show filtered data for new active wallet
-  HomeScreen avatar tap → WalletsScreen
-  HomeScreen wallet name pill → WalletsScreen
+  WalletsScreen tap → switchWallet(id) → goBack() → all screens reflect new wallet
+
+Demo enter:
+  Settings → Try Demo → LOAD_DEMO → isDemoMode:true → DemoBanner appears
+
+Demo exit (two paths):
+  1. DemoBanner "Exit" button (any screen)
+  2. Settings → DATA MANAGEMENT → "Exit Demo" row
+  Both call exitDemo() → EXIT_DEMO → _realStateSnapshot restored
 ```
 
 ---
 
 ## 15. ENCRYPTION (Passcode Export)
 
-XOR encryption — sufficient for ₹49 app privacy. Not military-grade but acceptable.
-
-```js
-// Encrypt: returns 'FINOVA_ENC:<hex>' or null
-function encryptJson(jsonStr, password) {
-  const key     = Array.from(password).map(c => c.charCodeAt(0));
-  const encoded = encodeURIComponent(jsonStr);  // safe ASCII
-  const hex     = Array.from(encoded).map((c, i) =>
-    (c.charCodeAt(0) ^ key[i % key.length]).toString(16).padStart(2, '0')
-  ).join('');
-  return 'FINOVA_ENC:' + hex;
-}
-
-// Decrypt: returns original JSON string or null on wrong password
-function decryptJson(encStr, password) {
-  if (!encStr?.startsWith('FINOVA_ENC:')) return null;
-  const key  = Array.from(password).map(c => c.charCodeAt(0));
-  const hex  = encStr.slice(11);
-  const chars = [];
-  for (let i = 0; i < hex.length; i += 2) {
-    const byte = parseInt(hex.slice(i, i + 2), 16);
-    chars.push(String.fromCharCode(byte ^ key[(i / 2) % key.length]));
-  }
-  return decodeURIComponent(chars.join(''));
-}
-```
-
-**Upload flow auto-detection:** `handleUpload` reads file content. If it starts with `FINOVA_ENC:` → open `DecryptImportModal`. Otherwise parse as JSON.
+XOR encryption — FINOVA_ENC2: format: salt + hash-derived key + positional shift. Both v1 (FINOVA_ENC:) and v2 supported for decryption. Upload flow auto-detects prefix.
 
 ---
 
@@ -516,27 +459,45 @@ function decryptJson(encStr, password) {
 
 | Error | Cause | Fix |
 |---|---|---|
-| White/grey flash on modal | Native modal bg on Android | `panDownManual` + internal `Animated.View` |
-| Exit animation grey flash | Spring-down before goBack | Immediate `goBack()` — no exit spring |
-| Note hidden behind keyboard | KAV broken inside Android modals | `softwareKeyboardLayoutMode:'pan'` in app.json |
-| `MediaTypeOptions` crash | SDK 55 deprecated API | Omit `mediaTypes` entirely |
-| `darkColors.bg` wrong | `'#222222'` not `'#222629'` | Fixed in theme.js |
-| Activity delete used system Alert | `Alert.alert` not custom modal | `DeleteTxnModal` added |
-| `executeClear` wiped `hasOnboarded` | `AsyncStorage.clear()` in executeClear | Replaced with `setItem('@flo_data',...)` |
-| HomeScreen taps did nothing | No `onPress` on TransactionItem | `TouchableOpacity` wrapping added |
-| Stats pills overflow | `'3 Month'`/`'6 Month'` too wide | `'3M'`/`'6M'` |
-| Username overflow | No numberOfLines | `numberOfLines={1}` + ellipsis |
-| Amount overflow | No maxLength | `maxLength={12}` |
-| AppGuide entry too slow | `stiffness:24` typo | Fixed to `stiffness:240` |
-| `[runtime not ready] EventEmitter undefined` | Stale Metro cache after new file drops | `npx expo start --clear` |
-| `Invalid number formatting character 'z'` | Malformed SVG path in SettingsScreen CameraIcon | Fixed arc parameters from `a4 4 1 0 0-8 4 4 0 0 0 0 8z` to `a4 4 0 1 0 0-8 4 4 0 1 0 0 8z` |
-| **CRITICAL** Pro JSON Injection Bypass | `LOAD_DATA` overwritten full settings including privileges | Stripped `isPro` / `appLock` from incoming payload |
-| **CRITICAL** App Lock Cold-Boot Bypass | `AppState` listener only checks minimizes | Added immediate mount check to `AppLockOverlay` |
-| **HIGH** O(N) Array Iteration Freeze | Mapping thousands of nodes inside `ScrollView` | Sliced array output to 100 on primary feeds |
-| **HIGH** Weak XOR Encryption | Exposed static passcodes | Replaced with `FINOVA_ENC2` salted-hash positional shift |
-| **MEDIUM** CSV Wallet Isolation | CSV import hard-forced `walletId: 'default'` | Rewrote `parseCsvBackup` to build/map `wallets[]` dynamically |
-| **MEDIUM** Future Date Filter Leak | JS date math went negative, dropping below 7 days | Bound check to `diff >= 0 && diff <= 7` |
-| **LOW** Instant Modal Snap Dismount | `navigation.goBack()` fired before spring animation | Wrapped `goBack` inside `Animated.spring().start()` callback |
+| White/grey flash on modal | Native modal bg on Android | panDownManual + internal Animated.View |
+| Exit animation grey flash | Spring-down before goBack | Immediate goBack() — no exit spring |
+| Note hidden behind keyboard | KAV broken inside Android modals | softwareKeyboardLayoutMode:'pan' in app.json |
+| MediaTypeOptions crash | SDK 55 deprecated API | Omit mediaTypes entirely |
+| darkColors.bg wrong | '#222222' not '#222629' | Fixed in theme.js |
+| Activity delete used system Alert | Alert.alert not custom modal | DeleteTxnModal added |
+| executeClear wiped hasOnboarded | AsyncStorage.clear() | Replaced with setItem('@flo_data',...) |
+| HomeScreen taps did nothing | No onPress on TransactionItem | TouchableOpacity wrapping added |
+| Stats pills overflow | Long labels | Shorter label |
+| Amount overflow | No maxLength | maxLength={12} |
+| AppGuide entry too slow | stiffness:24 typo | Fixed to stiffness:240 |
+| [runtime not ready] EventEmitter | Stale Metro cache | npx expo start --clear |
+| Invalid number formatting char 'z' | Malformed SVG path | Fixed arc parameters |
+| CRITICAL Pro JSON Injection | LOAD_DATA overwrote isPro | Strip isPro from backup payload |
+| CRITICAL App Lock Cold-Boot Bypass | AppState listener only on minimize | Added mount check to AppLockOverlay |
+| HIGH O(N) Array Freeze | Mapping thousands in ScrollView | Sliced output to 100 |
+| HIGH Weak XOR Encryption | Static passcodes | FINOVA_ENC2 salted-hash positional shift |
+| MEDIUM CSV Wallet Isolation | walletId hardforced | parseCsvBackup builds wallets[] dynamically |
+| MEDIUM Future Date Filter Leak | Negative diff | Bound check diff >= 0 && diff <= 7 |
+| LOW Instant Modal Snap Dismount | goBack before spring | Wrapped in spring callback |
+| Profile crop removed | allowsEditing:false | Restored allowsEditing:true, aspect:[1,1] |
+| Demo categories "Others" / one colour donut | Title case in demo data | Lowercase ids in all demo transactions |
+| Exit demo resets to light theme | EXIT_DEMO returned initialState | EXIT_DEMO restores _realStateSnapshot |
+| Demo data bloated SettingsScreen | Inline DEMO_DATA | Extracted to src/data/demoData.js |
+| Activity annual < quarter | Front-loaded transactions | Rebalanced across 27 months |
+| Date rollover accepted (Feb 31) | JS Date silent rollover | handleSubmit validates getDate/getMonth/getFullYear |
+| WalletsScreen wrong transition | slideRight instead of panDownManual | Changed to panDownManual in App.js |
+| WalletsScreen double animation | Internal slideAnim conflicting | Removed internal Animated.View |
+| WalletsScreen ReferenceError on delete | walletToDelete never declared | Added useState(null) for walletToDelete |
+| HomeScreen balance overflow | Static fontSize:42 | adjustsFontSizeToFit + numberOfLines={1} |
+| ProPaywall bg wrong | Documented as #1A1D1A | Corrected to #090A09 |
+| Demo banner covering content | position:absolute overlaps nav | AppLockOverlay marginTop:DEMO_BANNER_HEIGHT |
+| **Pro resets on app reopen** | Persist useEffect ran during demo, saving demo state (isPro:false) over real state | Added `if (state.isDemoMode) return` guard to persist useEffect |
+| **Demo resets Pro on exit** | EXIT_DEMO returned initialState instead of snapshot | EXIT_DEMO now returns `{ ...snapshot, isDemoMode:false, _realStateSnapshot:null }` |
+| **LOAD_DEMO lost real isPro** | Snapshot not saved before demo load | LOAD_DEMO now saves full state snapshot including isPro before loading demo |
+| **Demo stuck in dark theme** | DEMO_DATA.settings.darkMode:true overrode user preference; toggleDarkMode blocked in demo | LOAD_DEMO preserves state.settings.darkMode; UPDATE_SETTINGS unblocks darkMode-only writes in demo |
+| **No Exit Demo in Settings** | Exit only via DemoBanner; no symmetry with Try Demo location | Try Demo row replaced with conditional Try/Exit based on isDemoMode |
+| **Keyboard covers PIN setup modal** | Modal content at bottom; keyboard not avoided | Modal content vertically centred; paddingBottom:300; softwareKeyboardLayoutMode:'pan' in app.json |
+| **Keyboard covers Login decrypt input** | No KAV in DecryptImportModal | KAV + justifyContent:'flex-end' + marginBottom:40 added to DecryptImportModal |
 
 ---
 
@@ -544,105 +505,57 @@ function decryptJson(encStr, password) {
 
 | # | Change | Files |
 |---|---|---|
-| 49–135 | v2.6.0 through v2.8.0 changes (see previous KB) | — |
-| 136 | Added `isPro: false` to AppContext settings | AppContext.js |
-| 137 | Added `updatePro(bool)` action | AppContext.js |
-| 138 | `addCustomCategory` returns `'limit_reached'` if free and ≥3 cats | AppContext.js |
-| 139 | `isPro` shortcut in context value | AppContext.js |
-| 140 | `handleAddNewCat` checks return value — ProPaywall on limit | AddTransactionScreen.js |
-| 141 | ProPaywall paywall screen built | ProPaywallScreen.js |
-| 142 | ProPaywall registered in both Stack branches | App.js |
-| 143 | Download Data row gated behind isPro | SettingsScreen.js |
-| 144 | "Upgrade to Pro" row added to Settings App section | SettingsScreen.js |
-| 145 | Pro badge `👑 PRO` on Settings profile card | SettingsScreen.js |
-| 146–148 | v2.9.0 delivered | — |
-| 149 | **App Lock** — `AppLockOverlay` in App.js, AppState watcher, PIN pad modal, shake animation | App.js |
-| 150 | App Lock PIN setup: `PinSetupModal` (two-step, 4-digit) in Settings | SettingsScreen.js |
-| 151 | `appLockEnabled` + `appLockPin` added to AppContext settings state | AppContext.js |
-| 152 | App Lock toggle (Pro-gated) in Preferences section | SettingsScreen.js |
-| 153 | **Multiple Wallets** — `wallets[]` + `activeWalletId` + wallet CRUD reducers in AppContext | AppContext.js |
-| 154 | `activeTransactions` computed value added to AppContext | AppContext.js |
-| 155 | `addTransaction` auto-tags `walletId: state.activeWalletId` | AppContext.js |
-| 156 | `addWallet` returns `'requires_pro'` or `'ok'` | AppContext.js |
-| 157 | `WalletsScreen.js` built — full wallet CRUD UI | WalletsScreen.js (NEW) |
-| 158 | WalletsScreen registered in both Stack branches (slideRight) | App.js |
-| 159 | Wallets row added to Settings APP section | SettingsScreen.js |
-| 160 | HomeScreen uses `activeTransactions`, wallet name pill on card | HomeScreen.js |
-| 161 | ActivityScreen uses `activeTransactions` | ActivityScreen.js |
-| 162 | StatsScreen uses `activeTransactions` | StatsScreen.js |
-| 163 | **Transaction Search** — search icon beside "Recent Transactions", Pro-gated, inline filter bar | ActivityScreen.js |
-| 164 | **CSV Export** — `handleCsvExport` in Settings, Pro-gated, shares `.csv` via expo-sharing | SettingsScreen.js |
-| 165 | **Passcode Export** — XOR encrypt JSON, `PasscodeExportModal`, shares `.enc` file | SettingsScreen.js |
-| 166 | **Decrypt Import** — `DecryptImportModal`, auto-detected in Upload Data flow | SettingsScreen.js |
-| 167 | `executeClear` updated to preserve `appLockEnabled`, `appLockPin`, `wallets`, `activeWalletId` | SettingsScreen.js |
-| 168 | `performLogout` resets wallets to `[DEFAULT_WALLET]` + `activeWalletId:'default'` | SettingsScreen.js |
-| 169 | ProPaywall rebuilt — 7 feature rows, 900ms TEST delay, `#1A1D1A` bg | ProPaywallScreen.js |
-| 170 | `sharedScreens` pattern in App.js — avoids duplicating 4 screens across both branches | App.js |
-| 171 | AddTransactionScreen ErrorModal gains `actionLabel`/`onAction` props for Pro upgrade CTA | AddTransactionScreen.js |
-| 172 | app.json version bumped to `3.0.0` | app.json |
-| 173 | AppGuide footnote should be updated to `v3.0.0` | AppGuideScreen.js |
-| 174 | Fixed CameraIcon SVG path crashing the app | SettingsScreen.js |
-| 175 | **Deep QA Audit Completed** — 7 vulnerabilities identified | Walkthrough.md |
-| 176 | **v3.0.1 Patch Cycle Delivered** — All 7 QA Vulnerabilities decisively patched | Multiple files |
-| 177 | App Lock bug — explicitly mapped `RESET_APP` in context to wipe lock on logout | AppContext.js, SettingsScreen.js |
-| 178 | AppGuide redesign — distinctly separated Free Features and Pro Features arrays | AppGuideScreen.js |
-| 179 | Settings Download Restrict — Free users only see "Log Out" destructive option | SettingsScreen.js |
-| 180 | ProPaywall stacked layout redesign + huge "finova" top logo + premium styling | ProPaywallScreen.js |
-| 181 | Instant close transitions removed `Animated.spring` on exit for Wallets, AppGuide, ProPaywall | Multiple files |
-| 182 | DataInfoScreen onboarding features updated to include new Encrypt & Privacy emphasis | DataInfoScreen.js |
-| 183 | LogoutModal explicitly shows 3 distinct options, routing Free users to Paywall on 'Download' | SettingsScreen.js |
-| 184 | ProPaywall pricing updated to visually reflect ₹49 Limited Time Offer | ProPaywallScreen.js |
+| 49–135 | v2.6.0 through v2.8.0 | — |
+| 136–170 | v2.9.0 through v3.0.2 (Pro System, App Lock, Wallets, Search, Demo Mode) | — |
+| 171 | WalletsScreen transition changed from slideRight to panDownManual | App.js |
+| 172 | WalletsScreen internal Animated.View removed | WalletsScreen.js |
+| 173 | walletToDelete useState(null) added | WalletsScreen.js |
+| 174 | HomeScreen balance adjustsFontSizeToFit + numberOfLines={1} | HomeScreen.js |
+| 175 | ProPaywall bg corrected to #090A09 | ProPaywallScreen.js, KB |
+| 176 | Demo banner offset: AppLockOverlay marginTop:DEMO_BANNER_HEIGHT | App.js |
+| 177 | DEMO_BANNER_HEIGHT = 74 exported from App.js | App.js |
+| 178 | demoData.js extracted to src/data/ | demoData.js |
+| 179 | Demo transactions corrected to lowercase category ids | demoData.js |
+| 180 | Demo data expanded to Dec 2026 | demoData.js |
+| 181 | Monochrome icon specification added | KB, assets/ |
+| 182 | **Persist useEffect isDemoMode guard added** — demo data never saved to AsyncStorage | AppContext.js |
+| 183 | **LOAD_DEMO saves full state snapshot including isPro** | AppContext.js |
+| 184 | **EXIT_DEMO restores _realStateSnapshot** — never returns initialState | AppContext.js |
+| 185 | **LOAD_DEMO preserves real user darkMode** — demo loads in user's theme | AppContext.js |
+| 186 | **UPDATE_SETTINGS unblocks darkMode-only writes in demo** | AppContext.js |
+| 187 | **Try Demo / Exit Demo conditional row** in Settings DATA MANAGEMENT | SettingsScreen.js |
+| 188 | **PinSetupModal keyboard fix** — vertically centred, paddingBottom:300 | SettingsScreen.js |
+| 189 | **DecryptImportModal KAV fix** — KAV + justifyContent flex-end + marginBottom:40 | LoginScreen.js |
+| 190 | **softwareKeyboardLayoutMode:'pan'** added to app.json android section | app.json |
+| 191 | Version bumped to 3.0.6 | KB |
 
 ---
 
 ## 20. PRO SYSTEM — ARCHITECTURE & MONETIZATION
 
-### Free vs Pro feature split *(v3.0)*
-| Feature | Free | Pro |
-|---|---|---|
-| All transactions (add/edit/delete) | ✅ Unlimited | ✅ Unlimited |
-| Base categories (8 expense + income) | ✅ All | ✅ All |
-| Custom categories | ✅ 3 max | ✅ Unlimited |
-| Data Export / JSON Backup | ❌ Locked → paywall | ✅ Unlocked |
-| CSV Export | ❌ Locked → paywall | ✅ Unlocked |
-| Passcode Export | ❌ Locked → paywall | ✅ Unlocked |
-| App Lock (PIN) | ❌ Locked → paywall | ✅ Unlocked |
-| Multiple Wallets (create new) | ❌ Locked → paywall | ✅ Unlocked |
-| Transaction Search | ❌ Locked → paywall | ✅ Unlocked |
-| Dark + Light theme | ✅ Both | ✅ Both |
-| Home / Activity / Stats screens | ✅ Full | ✅ Full |
-| All future Pro features | ❌ | ✅ Auto-included |
+### Current State (TEST MODE)
+`react-native-purchases` is NOT installed. Purchase flow is simulated: 900ms delay → `updatePro(true)` → `goBack()`. Do NOT ship to production without RevenueCat integration.
 
-**Price: ₹199 one-time.**
+### RevenueCat Integration Plan (v3.1.0)
+Play Console account created — in verification (May 2026). Cannot create in-app products until verification clears and at least one internal build is published.
 
-### Current payment state: TEST MODE
-`react-native-purchases` (RevenueCat) is NOT yet installed. Paywall purchase calls `updatePro(true)` directly after 900ms fake delay.
+**Planned integration order:**
+1. Verification clears → EAS internal build → upload to Play Console internal track
+2. Create in-app product `finova_pro_lifetime` at ₹199, type: non-consumable (or subscription)
+3. RevenueCat dashboard: Create entitlement `pro`, product `finova_pro_lifetime`, offering `default`
+4. Link RevenueCat to Play Console via Google Service Account JSON key
+5. Install SDK: `npx expo install react-native-purchases react-native-purchases-ui`
+6. Add plugin to app.json: `"plugins": ["react-native-purchases"]`
+7. Replace TEST MODE purchase flow with RevenueCat SDK calls
 
-### RevenueCat integration (when Play Store account is ready)
-1. Install: `npx expo install react-native-purchases`
-2. Add to `app.json` plugins: `"react-native-purchases"`
-3. Create EAS dev build: `eas build --profile development --platform android`
-4. In `App.js` root useEffect: `Purchases.configure({ apiKey: 'YOUR_RC_ANDROID_KEY' })`
-5. In `ProPaywallScreen.handlePurchase`: replace `setTimeout` block with:
-   ```js
-   const offerings = await Purchases.getOfferings();
-   const pkg = offerings.current?.availablePackages[0];
-   const { customerInfo } = await Purchases.purchasePackage(pkg);
-   if (customerInfo.entitlements.active['pro']) {
-     updatePro(true);
-     navigation.goBack();
-   }
-   ```
-6. In `ProPaywallScreen.handleRestore`: replace with:
-   ```js
-   const customerInfo = await Purchases.restorePurchases();
-   if (customerInfo.entitlements.active['pro']) {
-     updatePro(true);
-     Alert.alert('Restored!', 'Finova Pro has been restored.');
-   }
-   ```
-7. Play Console: Create in-app product `finova_pro_lifetime` at ₹199, type: non-consumable
-8. RevenueCat dashboard: Create entitlement `pro`, product `finova_pro_lifetime`, offering `default`
+### Pro Features
+- Unlimited custom categories (Free: max 3)
+- Transaction Search (Activity screen)
+- App Lock (PIN)
+- Multiple Wallets (create beyond default Personal)
+- Download Data (JSON backup)
+- CSV Export
+- Passcode Export (encrypted backup)
 
 ---
 
@@ -652,68 +565,60 @@ function decryptJson(encStr, password) {
 ```bash
 npx expo start --clear
 ```
-
-### Always use `--clear` after dropping in new files
-Metro caches bundles. New files (WalletsScreen, ProPaywallScreen) or changed imports will cause `[runtime not ready] EventEmitter undefined` without `--clear`.
-
-### Nuclear reset (if `--clear` alone doesn't work)
-```bash
-rm -rf node_modules
-npm install
-npx expo start --clear
-```
+Always use `--clear` after dropping in new files — Metro cache causes EventEmitter crash otherwise.
 
 ### Testing Free Mode
-Default state: `isPro: false`. At 3 custom categories, "+ New" chip label changes to "Pro" and error modal offers upgrade. Search icon shows 🔒 badge. App Lock toggle redirects to paywall.
+Default: isPro:false. At 3 custom categories "+ New" shows "Pro" label. Search icon shows 🔒 badge. App Lock redirects to paywall.
 
 ### Testing Pro Mode
-On the paywall, tap "Unlock Finova Pro →". isPro becomes `true` in 900ms (TEST MODE). All Pro features unlock instantly. To reset: log out.
+Tap "Unlock Finova Pro →" on paywall. isPro becomes true in 900ms. To reset: log out.
+
+### Testing Demo Mode
+Settings → DATA MANAGEMENT → Try Demo. 2-year dataset loads instantly. Renders in user's real theme. All writes blocked except darkMode toggle. Exit via DemoBanner OR Settings → DATA MANAGEMENT → Exit Demo.
 
 ### Testing App Lock
-1. Go to Settings → Preferences → App Lock (requires Pro)
-2. Toggle ON → set a 4-digit PIN
-3. Send app to background → bring back to foreground
-4. PIN overlay appears
-
-### Testing Wallets
-1. Settings → APP → Wallets (or HomeScreen wallet pill)
-2. Create new wallet (requires Pro)
-3. Switch to it — HomeScreen card shows wallet name
-4. Add transactions — they appear only in that wallet's view
-5. Switch back to Personal — those transactions disappear from view (not deleted)
+1. Settings → App Lock (requires Pro) → toggle ON → set 4-digit PIN
+2. Background app → foreground → PIN overlay appears
+3. Demo mode: App Lock never triggers
 
 ### Re-testing Onboarding
 ```js
 await AsyncStorage.removeItem('hasOnboarded');
 ```
 
+### 🛑 Pro Resets on Reopen
+Ensure persist useEffect has `if (state.isDemoMode) return` guard. Ensure EXIT_DEMO restores snapshot not initialState.
+
+### 🛑 Demo Resets Theme
+Ensure LOAD_DEMO copies `state.settings.darkMode` into demo settings. Ensure UPDATE_SETTINGS allows darkMode-only writes in demo.
+
+### 🛑 Keyboard Covers PIN / Login Input
+Confirm `"softwareKeyboardLayoutMode":"pan"` is in app.json android section. Confirm PinSetupModal is vertically centred with paddingBottom:300. Confirm DecryptImportModal has KAV.
+
 ### 🛑 White / Grey Flash on Modal
-Both AddTransaction and AppGuide and ProPaywall use `panDownManual` + internal animation. Do NOT switch to `panDownModal`.
+All 4 modal screens use panDownManual. Do NOT switch to panDownModal.
 
-### 🛑 Pro Gate Not Showing
-Check `isPro` is correctly in the context value. Ensure `addCustomCategory` returns `'limit_reached'` and the caller checks it.
+### 🛑 Double Animation on WalletsScreen
+Do NOT add internal Animated.View to WalletsScreen.
 
-### 🛑 ProPaywall / Wallets Not Found in Navigation
-Both screens must be in **both** Stack branches. Use the `sharedScreens` pattern.
+### 🛑 ReferenceError on Wallet Delete
+walletToDelete and setWalletToDelete must be useState(null) in WalletsScreen.
 
-### 🛑 isPro Resets After Clear All Data
-This should NOT happen. `executeClear` uses `AsyncStorage.setItem('@flo_data',...)` and explicitly preserves `isPro`. If it resets, check `executeClear` is NOT calling `AsyncStorage.clear()`.
-
-### 🛑 Wallet transactions showing cross-wallet
-All screens must use `activeTransactions` from context, not raw `transactions`. Check imports.
+### 🛑 Demo Banner Covering Content
+Offset is in AppLockOverlay only. Never add per-screen padding.
 
 ---
 
 ## 22. SECURITY & ROBUSTNESS NOTES
 
 ### isPro security
-Local AsyncStorage flag. No server-side validation. Acceptable for privacy-first local app at ₹199 price point. RevenueCat integration will add receipt validation when ready.
+Local AsyncStorage flag. LOAD_DATA strips isPro from backup payload — cannot be injected via backup file. RevenueCat receipt validation in v3.1.0.
 
-### Passcode Export security
-XOR encryption with URL-encoded payload. Not cryptographically strong, but sufficient for privacy backup use case. A determined user with hex editor could brute-force short passwords. Acceptable for this app.
+### Demo Mode security
+Never written to AsyncStorage. All writes are pure no-op except darkMode toggle (v3.0.6). No toast or error on blocked actions.
 
 ### App Lock security
-PIN stored as plaintext in AsyncStorage (inside `@flo_data`). Not in secure storage. A user with device ADB access could read it. For current use case this is acceptable — App Lock is a convenience lock, not a security guarantee. Future: migrate to `expo-secure-store`.
+PIN stored as plaintext in AsyncStorage. Convenience lock, not security guarantee. Cold-boot protected: fires on mount AND AppState. Fully bypassed in demo mode.
 
 ---
 
@@ -721,51 +626,71 @@ PIN stored as plaintext in AsyncStorage (inside `@flo_data`). Not in secure stor
 
 1. **Font keys: `Fungis-*`** — never `FUNGIS-*`.
 2. **Asset path:** `../../assets/` from screens.
-3. **Currency stored as symbol.** Lives in Edit Profile.
+3. **Currency stored as symbol.**
 4. **Hook is `useApp()`.**
 5. **`hasOnboarded` flag survives executeClear.** Only logout clears it.
 6. **No back button on WelcomeScreen.**
 7. **`navigation.reset`** for onboarding exit and logout.
 8. **`updateSettings`** for profile fields. **`updatePro(bool)`** for Pro status.
-9. **Onboarding always dark** — never reads `settings.darkMode`.
-10. **All screens in both Stack branches.** Use `sharedScreens` pattern.
+9. **Onboarding always dark.**
+10. **All screens in both Stack branches.** Use sharedScreens pattern.
 11. **No JSX comments inside navigator blocks.**
 12. **`profileImage` is base64 data URI.**
-13. **JSON backup contains everything** including `isPro`, `wallets`, `activeWalletId`.
-14. **AddTransaction + AppGuide + ProPaywall all use `panDownManual`** — internal animation, no native modal flash.
-15. **Wallets screen uses `slideRight`** — standard horizontal slide.
-16. **No spring-down exit on panDownManual screens** — immediate `goBack()`.
+13. **JSON backup contains everything** including isPro, wallets, activeWalletId.
+14. **AddTransaction + AppGuide + ProPaywall + Wallets all use `panDownManual`.**
+15. **Wallets uses `panDownManual`** — changed from slideRight in v3.0.3. Do NOT revert.
+16. **No spring-down exit on any panDownManual screen** — immediate goBack() on all.
 17. **Tab bar: `elevation:100`.** Inactive: `display:'none'`.
 18. **Tab.Navigator NOT used** — MainTabs is custom.
 19. **`contentStyle:{backgroundColor:'#111'}` on all stack screens.**
 20. **Never `Alert.alert()` for destructive actions** — use custom modals.
-21. **Modal sheet: `#2C3020`. ProPaywall + AppLock bg: `#1A1D1A`.**
+21. **Modal sheet: `#2C3020`. AppLock bg: `#1A1D1A`. ProPaywall bg: `#090A09`.**
 22. **TermsModal "I Understand" does NOT auto-tick.**
 23. **`executeClear` uses `AsyncStorage.setItem` NOT `AsyncStorage.clear()`.**
 24. **`executeClear` preserves `customCategories`, `isPro`, `appLockEnabled`, `appLockPin`, `wallets`, `activeWalletId`.**
 25. **Creator credit always visible.**
 26. **Never add KAV to AddTransactionScreen.**
 27. **Never use `ImagePicker.MediaTypeOptions`.**
-28. **Never re-add custom crop modal.**
+28. **Profile picture picker: `allowsEditing:true, aspect:[1,1]`.**
 29. **`darkColors.bg` is `'#222629'`.**
 30. **HomeScreen rows are tappable** — TouchableOpacity wrapping.
-31. **Stats filters: `['Week','Month','3 Month','6 Month','Year']`.** Month view graphs map every day of the month explicitly (30/31 days) but restrict label steps (`n <= 31 ? 2 : Math.max(1, Math.ceil(n / 10))`) to display precisely ~15 axes points.
-32. **Version is `3.0.0`.**
+31. **Stats filters: `['Week','Month','3 Month','6 Month','Year']`.**
+32. **Version is `3.0.6`.**
 33. **Negative SafeAreaView padding is intentional** — `paddingTop:-50`, `paddingBottom:-100`.
-34. **AppGuide, AddTransaction, and Wallets screen spring stiffness is `240`**. They all explicitly utilize `panDownManual` preset in Navigation, paired with an internal `Animated.View` spring slide-up and instantaneous `goBack()` exit to eliminate transit lag.
-35. **`addCustomCategory` returns `'limit_reached'` or `'ok'`** — callers must check return value.
-36. **`addWallet` returns `'requires_pro'` or `'ok'`** — callers must check return value.
-37. **`isPro: false` is free mode. `isPro: true` is Pro.** No other states.
-38. **ProPaywall is TEST MODE** — `handlePurchase` sets isPro directly after 900ms. Do NOT ship to production without RevenueCat.
-39. **`react-native-purchases` is NOT yet installed** — do not import or reference it.
-40. **All screens (ProPaywall + Wallets) must be in BOTH Stack branches.** Use `sharedScreens` pattern.
-41. **`activeTransactions` is the wallet-filtered list.** Use it in all display screens. Raw `transactions` only for cross-wallet use cases.
-42. **`walletId` is auto-tagged on `addTransaction`.** Old transactions default to `'default'` via `(t.walletId || 'default')`.
+34. **AddTransaction, AppGuide, ProPaywall spring stiffness is `240`, damping `26`.**
+35. **WalletsScreen uses `panDownManual`** — NO internal Animated.View.
+36. **`addCustomCategory` returns `'limit_reached'`, `'ok'`, or `'demo_mode'`.**
+37. **`addWallet` returns `'requires_pro'`, `'ok'`, or `'demo_mode'`.**
+38. **`isPro: false` is free mode. `isPro: true` is Pro.**
+39. **ProPaywall is TEST MODE** — do NOT ship without RevenueCat.
+40. **`react-native-purchases` is NOT yet installed.**
+41. **`activeTransactions` is the wallet-filtered list.** Use in all display screens.
+42. **`walletId` is auto-tagged on `addTransaction`.**
 43. **Default wallet `id:'default'` cannot be deleted or archived.**
 44. **Delete wallet migrates its transactions to `'default'`.**
-45. **Always run `npx expo start --clear` after dropping in new files** — Metro cache causes EventEmitter crash otherwise.
-46. **Terms & Conditions in CreateAccountScreen must always include the "Last updated March 2026" text to ensure legal timeline consistency.**
-47. **No OS Alerts:** Never utilize native `Alert.alert` for success, error, or confirmation boundaries. Use standard `MessageModal` or `RestoreConfirmModal` custom overlays in `SettingsScreen` and `LoginScreen`.
+45. **Always run `npx expo start --clear` after dropping in new files.**
+46. **Terms & Conditions must include "Last updated March 2026".**
+47. **No OS Alerts** — use MessageModal or RestoreConfirmModal.
+48. **`walletToDelete` and `setWalletToDelete` MUST be `useState(null)` in WalletsScreen.**
+49. **HomeScreen balance `Text` MUST have `adjustsFontSizeToFit` and `numberOfLines={1}`.**
+50. **Demo mode writes are ALL silently blocked** — except darkMode toggle (v3.0.6).
+51. **Demo data NEVER persists to AsyncStorage** — persist useEffect skips when `isDemoMode:true`.
+52. **`EXIT_DEMO` restores `_realStateSnapshot`** — never returns initialState if snapshot exists.
+53. **Demo transaction `category` field uses lowercase ids** — never title case labels.
+54. **`demoData.js` lives in `src/data/`.**
+55. **`DEMO_BANNER_HEIGHT = 74`** (exported from App.js). Never add per-screen padding.
+56. **`performLogout` MUST use `removeItem('@flo_data')` + `removeItem('hasOnboarded')`** — NEVER `AsyncStorage.clear()`.
+57. **Activity heatmap thresholds:** <500 light, <2000 medium, <5000 bright, ≥5000 full.
+58. **`+ New` chip Pro Gate enforced in `onPress`** — check isPro && cats.length >= 3.
+59. **Monochrome Icon:** transparent PNG, single colour, 108x108px (72x72px safe zone).
+60. **Persist useEffect MUST have `if (state.isDemoMode) return` guard** — demo data must never overwrite real state in AsyncStorage. (v3.0.6)
+61. **LOAD_DEMO MUST preserve `state.settings.darkMode`** — demo renders in user's real theme. (v3.0.6)
+62. **EXIT_DEMO MUST return full `_realStateSnapshot`** — never initialState. (v3.0.6)
+63. **UPDATE_SETTINGS in demo: unblock darkMode-only writes** — all other settings remain blocked. (v3.0.6)
+64. **Settings Try Demo / Exit Demo is a single conditional row** — same location, same section, switches based on isDemoMode. (v3.0.6)
+65. **`softwareKeyboardLayoutMode:'pan'` MUST be in `app.json` android section** — base fix for all keyboard coverage issues. (v3.0.6)
+66. **PinSetupModal: vertically centred, paddingBottom:300** — keyboard must not cover PIN dots. (v3.0.6)
+67. **DecryptImportModal in LoginScreen: KAV + justifyContent flex-end + marginBottom:40** — keyboard must not cover password input. (v3.0.6)
 
 ---
 
@@ -773,18 +698,17 @@ PIN stored as plaintext in AsyncStorage (inside `@flo_data`). Not in secure stor
 
 | Feature | Version | Notes |
 |---|---|---|
-| RevenueCat integration | v3.1.0 | Replace TEST MODE in ProPaywallScreen. Install `react-native-purchases`. |
-| App Lock biometrics | v3.1.0 | `expo-local-authentication`. Fingerprint/face as alternative to PIN. |
-| AppGuide footnote update | v3.0.x | Change `v2.9.0` to `v3.0.0` in AppGuideScreen.js |
-| Secure PIN storage | v3.1.0 | Migrate `appLockPin` from AsyncStorage to `expo-secure-store` |
-| DonutChart interactive segments | v3.1.0 | `onSegmentPress` on SVG arcs → legend highlight |
-| Wallet-aware CSV export | v3.0.x | Add wallet name column to CSV (already done in v3.0) |
-| Backup checksum | v3.1.0 | Version + hash in JSON backup to detect tampering |
-| Cross-wallet Stats view | v3.1.0 | Toggle in StatsScreen to see all wallets combined |
+| RevenueCat integration | v3.1.0 | Replace TEST MODE. Awaiting Play Console verification + first build upload. |
+| App Lock biometrics | v3.1.0 | expo-local-authentication |
+| Secure PIN storage | v3.1.0 | expo-secure-store |
+| DonutChart interactive segments | v3.1.0 | onSegmentPress on SVG arcs |
+| Backup checksum | v3.1.0 | Version + hash |
+| Cross-wallet Stats view | v3.1.0 | Toggle in StatsScreen |
+| Demo onboarding entry | v3.1.0 | Try Demo on WelcomeScreen |
+| AppGuide footnote update | v3.0.x | Update version reference |
 
 ---
 
-*Last updated: March 20, 2026*
-*Project: Finova Personal Finance App*
-*Version: 3.0.2 — Pro System + App Lock + Multiple Wallets + Transaction Search + CSV Export + Passcode Export + Deep QA Parity + Architecture Transitions Fixes*
+*Last updated: May 12, 2026*
+*Version: 3.0.6 — Pro Persistence Fix + Demo Theme Fix + Demo Exit Symmetry + Keyboard Coverage Fix*
 *Developer: Abhiram Kasturi*

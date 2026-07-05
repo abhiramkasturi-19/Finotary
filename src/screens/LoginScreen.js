@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ImageBackground, Modal, TextInput,
   TouchableOpacity, Dimensions, StatusBar, ActivityIndicator, Alert, Platform,
+  KeyboardAvoidingView, Keyboard,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -114,30 +115,35 @@ function DecryptModal({ visible, onCancel, onDecrypt }) {
   };
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onCancel}>
-      <View style={cm.backdrop}>
-        <View style={cm.sheet}>
-          <View style={cm.handle} />
-          <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔑</Text></View>
-          <Text style={cm.title}>Encrypted Backup</Text>
-          <Text style={cm.body}>This backup is password-protected. Enter the password to restore.</Text>
-          <TextInput
-            style={cm.pinInput}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Backup password"
-            placeholderTextColor="rgba(255,255,255,0.25)"
-            secureTextEntry
-            autoFocus
-          />
-          {!!error && <Text style={cm.errorText}>{error}</Text>}
-          <TouchableOpacity style={[cm.primaryBtn, { opacity: password ? 1 : 0.5 }]} onPress={handleTry} disabled={!password}>
-            <Text style={cm.primaryBtnText}>Restore</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={cm.ghostBtn} onPress={onCancel}>
-            <Text style={cm.ghostBtnText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
+          <View style={[cm.sheet, { marginBottom: 40 }]}>
+            <View style={cm.handle} />
+            <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔑</Text></View>
+            <Text style={cm.title}>Encrypted Backup</Text>
+            <Text style={cm.body}>This backup is password-protected. Enter the password to restore.</Text>
+            <TextInput
+              style={[cm.pinInput, { marginBottom: 20 }]}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Backup password"
+              placeholderTextColor="rgba(255,255,255,0.25)"
+              secureTextEntry
+              autoFocus
+            />
+            {!!error && <Text style={cm.errorText}>{error}</Text>}
+            <TouchableOpacity style={[cm.primaryBtn, { opacity: password ? 1 : 0.5 }]} onPress={handleTry} disabled={!password}>
+              <Text style={cm.primaryBtnText}>Restore</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={cm.ghostBtn} onPress={onCancel}>
+              <Text style={cm.ghostBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -185,7 +191,7 @@ export default function LoginScreen({ navigation }) {
       const fileUri = result.assets[0].uri;
       const content = await FileSystem.readAsStringAsync(fileUri);
 
-      if (content.startsWith('FINOVA_ENC:')) {
+      if (content.startsWith('FINOVA_ENC:') || content.startsWith('FINOVA_ENC2:')) {
         setPendingEnc(content);
         setDecryptOpen(true);
         setLoading(false);
