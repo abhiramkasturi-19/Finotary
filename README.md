@@ -1,6 +1,6 @@
-# Finova
+# Finotary
 
-**Finova** is a sophisticated Personal Finance Management mobile application built with **React Native** and **Expo**. It is designed to help users track their financial health with precision, style, and ease.
+**Finotary** is a sophisticated Personal Finance Management mobile application built with **React Native** and **Expo**. It is designed to help users track their financial health with precision, style, and ease.
 
 ## ✨ Key Features
 
@@ -10,8 +10,7 @@
 - 🎨 **Unique Categories**: Automatically assigns unique, non-clashing designer colors to every new category you create.
 - ⚡ **Streamlined Entry**: Redesigned transaction form with a **collapsible Date & Time** section for lightning-fast recording.
 - 📅 **Activity Explorer**: Calendar-based transaction history with daily, monthly, and yearly heatmaps.
-- 💾 **Data Management**: Full JSON backup and restore capabilities to keep your data safe and portable.
-
+- 💾 **Data Management**: Full JSON backup and restore capabilities, CSV export with metadata, and secure Passcode-Encrypted exports, featuring dynamic user-stamped filenames (`Finotary_<username>_<YYYY-MM-DD>.<ext>`) to keep your data organized and safe.
 ## 🚀 Tech Stack
 
 - **Framework**: Expo (SDK 55) / React Native
@@ -22,7 +21,7 @@
 
 ## 🎨 Design Philosophy
 
-Finova follows a "Designer Modern" aesthetic, focusing on:
+Finotary follows a "Designer Modern" aesthetic, focusing on:
 - High-contrast, accessibility-first color palettes.
 - Seamless, non-cropping navigation (Instagram-inspired).
 - Semantic color coding (Vibrant Red for Expenses, Sage Green for Income).
