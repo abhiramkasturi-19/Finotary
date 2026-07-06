@@ -1,5 +1,5 @@
 // src/data/demoData.js
-// Finova — Demo Mode sample data (2 years: Jan 2024 → Mar 2026)
+// Finotary — Demo Mode sample data (2 years: Jan 2024 → Mar 2026)
 // Categories use lowercase ids matching EXPENSE_CATEGORIES / INCOME_CATEGORIES in categories.js
 // Transactions are evenly distributed so annual totals always exceed quarterly totals
 
@@ -10,11 +10,9 @@ export const DEMO_DATA = {
     currency:       '₹',
     darkMode:       true,
     profileImage:   '',
-    isPro:          true,
     appLockEnabled: false,
     appLockPin:     '',
   },
-  isPro:          true,
   hasOnboarded:   'true',
   activeWalletId: 'default',
   wallets: [

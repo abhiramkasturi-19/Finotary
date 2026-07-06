@@ -1,5 +1,5 @@
 // src/screens/StatsScreen.js
-// Finova v3.0 — wallet-aware (activeTransactions)
+// Finotary v1.0.1 — wallet-aware (activeTransactions)
 
 import React, { useMemo, useState, useRef } from 'react';
 import {

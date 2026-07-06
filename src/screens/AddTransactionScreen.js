@@ -1,10 +1,10 @@
 // src/screens/AddTransactionScreen.js
-// Finova v3.0 — handles addCustomCategory 'limit_reached' (Pro gate on custom categories)
+// Finotary v1.0.1 — handles addCustomCategory 'limit_reached' (Pro gate on custom categories)
 
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
-  StyleSheet, Modal, Platform, Animated, Dimensions, BackHandler, KeyboardAvoidingView,
+  StyleSheet, Modal, Platform, Animated, Dimensions, BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
@@ -71,7 +71,7 @@ export default function AddTransactionScreen({ navigation, route }) {
   const {
     addTransaction, editTransaction,
     addCustomCategory, deleteCustomCategory,
-    customCategories, settings, isPro,
+    customCategories, settings,
   } = useApp();
   const colors = settings.darkMode ? darkColors : lightColors;
 
@@ -156,16 +156,7 @@ export default function AddTransactionScreen({ navigation, route }) {
 
     const result = addCustomCategory(type, name);
 
-    if (result === 'limit_reached') {
-      showError(
-        '🏷️',
-        'Category Limit Reached',
-        'Free accounts can save up to 3 custom categories. Upgrade to Pro for unlimited categories.',
-        '👑 Upgrade to Pro',
-        () => { closeError(); navigation.navigate('ProPaywall'); }
-      );
-      return;
-    }
+
 
     setCategory('custom_' + name.toLowerCase());
     setCustomCategory(name);
@@ -240,7 +231,6 @@ export default function AddTransactionScreen({ navigation, route }) {
   return (
     <Animated.View style={[sa.root, { transform: [{ translateY: slideAnim }] }]}>
       <SafeAreaView style={s.safe}>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
           {/* Header */}
@@ -318,23 +308,11 @@ export default function AddTransactionScreen({ navigation, route }) {
             {/* + New chip — shows Pro hint if at limit */}
             <TouchableOpacity
               style={[s.catChip, s.catChipAdd]}
-              onPress={() => {
-                if (!isPro && savedCustomCats.length >= 3) {
-                  showError(
-                    '🏷️',
-                    'Category Limit Reached',
-                    'Free accounts can save up to 3 custom categories. Upgrade to Pro for unlimited categories.',
-                    '👑 Upgrade to Pro',
-                    () => { closeError(); navigation.navigate('ProPaywall'); }
-                  );
-                } else {
-                  setShowNewCatBox(v => !v);
-                }
-              }}
+              onPress={() => setShowNewCatBox(v => !v)}
             >
               <Text style={s.catAddIcon}>＋</Text>
               <Text style={[s.catLabel, { color: colors.accent }]}>
-                {!isPro && savedCustomCats.length >= 3 ? 'Pro' : 'New'}
+                New
               </Text>
             </TouchableOpacity>
           </View>
@@ -442,8 +420,6 @@ export default function AddTransactionScreen({ navigation, route }) {
           </TouchableOpacity>
 
         </ScrollView>
-        </KeyboardAvoidingView>
-
         <ErrorModal
           visible={errorModal.visible}
           icon={errorModal.icon}

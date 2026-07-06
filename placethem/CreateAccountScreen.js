@@ -1,5 +1,5 @@
 // screens/CreateAccountScreen.js
-// Finova v2.5 — Onboarding Page 2
+// Finotary v1.0.1 — Onboarding Page 2
 // Username, Age, Theme, Currency, Terms checkbox → links to AppContext
 
 import React, { useState, useContext } from 'react';

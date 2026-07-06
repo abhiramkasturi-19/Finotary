@@ -1,5 +1,5 @@
 // src/screens/AppGuideScreen.js
-// Finova v2.6 — In-app usage guide
+// Finotary v1.0.1 — In-app usage guide
 
 import React, { useEffect, useRef } from 'react';
 import {
@@ -41,7 +41,7 @@ const FREE_FEATURES = [
   },
   {
     title: 'Demo Mode',
-    desc: 'Explore Finova with 2 years of realistic sample data — no sign-up needed. Tap Try Demo in Settings → Data Management. The app enters read-only mode with a green banner at the top. Tap Exit Demo to return to your real data instantly. Nothing from the demo is ever saved.',
+    desc: 'Explore Finotary with 2 years of realistic sample data — no sign-up needed. Tap Try Demo in Settings → Data Management. The app enters read-only mode with a green banner at the top. Tap Exit Demo to return to your real data instantly. Nothing from the demo is ever saved.',
   },
 ];
 
@@ -114,7 +114,7 @@ export default function AppGuideScreen({ navigation }) {
           <View style={styles.titleAccent} />
 
           <Text style={styles.intro}>
-            A complete reference for Finova Free and Pro features.
+            A complete reference for Finotary Free and Pro features.
           </Text>
 
           <Text style={styles.sectionHeading}>Free Features</Text>
@@ -143,7 +143,7 @@ export default function AppGuideScreen({ navigation }) {
             </View>
           ))}
 
-          <Text style={styles.footnote}>Finova v3.0.6 · Your data, your privacy.</Text>
+          <Text style={styles.footnote}>Finotary v1.0.1 · Your data, your privacy.</Text>
           <View style={{ height: 40 }} />
         </ScrollView>
         </Animated.View>

@@ -1,5 +1,5 @@
 // src/screens/CreateAccountScreen.js
-// Finova v2.8 — Onboarding Page 2 — custom crop modal
+// Finotary v1.0.1 — Onboarding Page 2 — custom crop modal
 
 import React, { useState } from 'react';
 import {
@@ -32,37 +32,37 @@ const TERMS_SECTIONS = [
   {
     heading: 'Section 1 — Acceptance of Terms',
     body: [
-      'By creating an account and using Finova, you agree to these Terms & Conditions. If you do not agree, do not use the app. These terms may be updated at any time by Abhiram Kasturi.'
+      'By creating an account and using Finotary, you agree to these Terms & Conditions. If you do not agree, do not use the app. These terms may be updated at any time by Abhiram Kasturi.'
     ],
   },
   {
     heading: 'Section 2 — Data Storage & Privacy',
     body: [
-      'Finova stores all your personal and financial data entirely on your device using local storage (AsyncStorage). No data is ever transmitted to any server, cloud, or third party. Abhiram Kasturi has no access to your data at any time. You are solely responsible for keeping your backup files safe.'
+      'Finotary stores all your personal and financial data entirely on your device using local storage (AsyncStorage). No data is ever transmitted to any server, cloud, or third party. Abhiram Kasturi has no access to your data at any time. You are solely responsible for keeping your backup files safe.'
     ],
   },
   {
     heading: 'Section 3 — Pro Subscription & Payments',
     body: [
-      'Finova offers a one-time Pro upgrade priced at ₹199 (Indian Rupees). This is a non-refundable, lifetime unlock. The purchase is processed securely through Google Play. Once purchased, Pro features are permanently unlocked on your account. To restore a previous purchase on a new device, use the Restore Purchase option on the paywall screen.'
+      'Finotary offers a one-time Pro upgrade priced at ₹199 (Indian Rupees). This is a non-refundable, lifetime unlock. The purchase is processed securely through Google Play. Once purchased, Pro features are permanently unlocked on your account. To restore a previous purchase on a new device, use the Restore Purchase option on the paywall screen.'
     ],
   },
   {
     heading: 'Section 4 — User Responsibilities',
     body: [
-      'You are responsible for maintaining the security of your device and app lock PIN. You are responsible for regularly exporting and storing your backup files. Finova is a personal finance tracking tool only — it is not a banking app, payment app, or financial advisory service.'
+      'You are responsible for maintaining the security of your device and app lock PIN. You are responsible for regularly exporting and storing your backup files. Finotary is a personal finance tracking tool only — it is not a banking app, payment app, or financial advisory service.'
     ],
   },
   {
     heading: 'Section 5 — Intellectual Property',
     body: [
-      'Finova, its design, code, and all assets are the intellectual property of Abhiram Kasturi. You may not copy, reverse engineer, redistribute, or resell any part of this app.'
+      'Finotary, its design, code, and all assets are the intellectual property of Abhiram Kasturi. You may not copy, reverse engineer, redistribute, or resell any part of this app.'
     ],
   },
   {
     heading: 'Section 6 — Disclaimer',
     body: [
-      'Finova is provided as-is without any warranties. Abhiram Kasturi is not liable for any financial decisions made based on data shown in the app, or for any data loss resulting from device failure, app deletion, or failure to maintain backups.'
+      'Finotary is provided as-is without any warranties. Abhiram Kasturi is not liable for any financial decisions made based on data shown in the app, or for any data loss resulting from device failure, app deletion, or failure to maintain backups.'
     ],
   },
 ];
@@ -106,8 +106,8 @@ function TermsModal({ visible, onClose }) {
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={modal.scrollContent}>
             <Text style={modal.intro}>
               Developer name: Abhiram Kasturi{'\n'}
-              App name: Finova{'\n'}
-              Last updated: May 2026
+              App name: Finotary{'\n'}
+              Last updated: March 2026
             </Text>
             {TERMS_SECTIONS.map((section, i) => (
               <View key={i} style={modal.section}>
@@ -122,7 +122,7 @@ function TermsModal({ visible, onClose }) {
             ))}
             <View style={modal.footerNote}>
               <Text style={modal.footerText}>
-                Finova v3.0.2{'\n'}© 2026 Abhiram Kasturi. All rights reserved.
+                Finotary v1.0.1{'\n'}© 2026 Abhiram Kasturi. All rights reserved.
               </Text>
             </View>
             <View style={{ height: 8 }} />

@@ -1,5 +1,5 @@
 // src/context/AppContext.js
-// Finova v3.0 — Pro system · Wallets · App Lock · CSV/Passcode Export · Search · Demo Mode
+// Finotary v1.0.1 — Pro system · Wallets · App Lock · CSV/Passcode Export · Search · Demo Mode
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,7 +33,6 @@ const initialState = {
     currency:       '₹',
     darkMode:       false,
     profileImage:   '',
-    isPro:          false,
     appLockEnabled: false,
     appLockPin:     '',
   },
@@ -52,7 +51,8 @@ function reducer(state, action) {
 
     case 'LOAD_DATA': {
       // Untrusted load from backup file — strip sensitive fields
-      const incoming = action.payload || {};
+      const incoming = { ...(action.payload || {}) };
+      delete incoming.exportMeta;
       const loaded   = incoming.customCategories || { expense: [], income: [] };
       const migrate  = (list) => {
         if (!list || !Array.isArray(list)) return [];
@@ -70,7 +70,6 @@ function reducer(state, action) {
           ...state.settings,
           ...(incoming.settings || {}),
           // Security: strip these from backup. Users must earn them on this device.
-          isPro:          state.settings.isPro,
           appLockEnabled: state.settings.appLockEnabled,
           appLockPin:     state.settings.appLockPin,
         },
@@ -186,8 +185,7 @@ function reducer(state, action) {
       return { ...state, settings: { ...state.settings, ...action.payload } };
     }
 
-    case 'UPDATE_PRO':
-      return { ...state, settings: { ...state.settings, isPro: action.payload } };
+
 
     case 'ADD_CUSTOM_CATEGORY': {
       const { type, name } = action.payload;
@@ -295,14 +293,11 @@ export function AppProvider({ children }) {
 
   // ── Settings actions ──────────────────────────────────────────────────────────
   const updateSettings = (s)   => { if (state.isDemoMode) return; dispatch({ type: 'UPDATE_SETTINGS', payload: s   }); };
-  const toggleDarkMode = ()    => { dispatch({ type: 'UPDATE_SETTINGS', payload: { darkMode: !state.settings.darkMode } }); };
-  const updatePro      = (val) => { if (state.isDemoMode) return; dispatch({ type: 'UPDATE_PRO',      payload: val }); };
+    const toggleDarkMode = ()    => { dispatch({ type: 'UPDATE_SETTINGS', payload: { darkMode: !state.settings.darkMode } }); };
 
   // ── Custom category actions ───────────────────────────────────────────────────
   const addCustomCategory = (type, name) => {
     if (state.isDemoMode) return 'demo_mode';
-    const current = state.customCategories[type] || [];
-    if (!state.settings.isPro && current.length >= 3) return 'limit_reached';
     dispatch({ type: 'ADD_CUSTOM_CATEGORY', payload: { type, name } });
     return 'ok';
   };
@@ -314,7 +309,6 @@ export function AppProvider({ children }) {
   // ── Wallet actions ────────────────────────────────────────────────────────────
   const addWallet = (name, icon) => {
     if (state.isDemoMode) return 'demo_mode';
-    if (!state.settings.isPro) return 'requires_pro';
     dispatch({
       type:    'ADD_WALLET',
       payload: { id: Date.now().toString(), name: name.trim(), icon: icon || '💼', archived: false },
@@ -343,7 +337,6 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       ...state,
       activeTransactions,
-      isPro: state.settings.isPro,
       isDemoMode: state.isDemoMode,
       // Transaction
       addTransaction,
@@ -352,7 +345,6 @@ export function AppProvider({ children }) {
       // Settings
       updateSettings,
       toggleDarkMode,
-      updatePro,
       // Categories
       addCustomCategory,
       deleteCustomCategory,

@@ -1,4 +1,4 @@
-// App.js — Finova v3.0
+// App.js — Finotary v1.0.1
 // Added: ProPaywallScreen · WalletsScreen · AppLock PIN overlay
 
 import React, { useEffect, useCallback, useState, useRef } from 'react';
@@ -24,14 +24,13 @@ import CreateAccountScreen   from './src/screens/CreateAccountScreen';
 import DataInfoScreen        from './src/screens/DataInfoScreen';
 import LoginScreen           from './src/screens/LoginScreen';
 import AppGuideScreen        from './src/screens/AppGuideScreen';
-import ProPaywallScreen      from './src/screens/ProPaywallScreen';
 import WalletsScreen         from './src/screens/WalletsScreen';
 import { lightColors, darkColors } from './src/theme/theme';
 import Icon from './src/components/Icon';
 
 SplashScreen.preventAutoHideAsync();
 
-const FinovaTheme = {
+const FinotaryTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
@@ -143,7 +142,7 @@ function AppLockOverlay({ children }) {
       </View>
       <Modal visible={locked} animationType="fade" transparent={false} statusBarTranslucent>
         <View style={lock.root}>
-          <Text style={lock.appName}>Finova</Text>
+          <Text style={lock.appName}>Finotary</Text>
           <Text style={lock.label}>Enter your PIN</Text>
 
           {/* Dots */}
@@ -377,7 +376,6 @@ export default function App() {
     <>
       <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={panDownManual} />
       <Stack.Screen name="AppGuide"       component={AppGuideScreen}       options={panDownManual} />
-      <Stack.Screen name="ProPaywall"     component={ProPaywallScreen}     options={panDownManual} />
       <Stack.Screen name="Wallets"        component={WalletsScreen}        options={panDownManual} />
     </>
   );
@@ -386,7 +384,7 @@ export default function App() {
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <AppProvider>
         <AppLockOverlay>
-          <NavigationContainer theme={FinovaTheme}>
+          <NavigationContainer theme={FinotaryTheme}>
             <Stack.Navigator screenOptions={{ headerShown: false, ...slideRight }}>
               {isOnboarded ? (
                 <>

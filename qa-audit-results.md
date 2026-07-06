@@ -1,6 +1,6 @@
-# Deep QA Audit Report — Finova v3.0.2
+# Deep QA Audit Report — Finotary v1.0.1
 **Audit Date:** Saturday, 21 March 2026
-**Target Version:** v3.0.2 (Pro System + App Lock + Multiple Wallets + Search + Demo Mode)
+**Target Version:** v1.0.1 (Pro System + App Lock + Multiple Wallets + Search + Demo Mode)
 
 ---
 
@@ -49,7 +49,7 @@
 
 ### **SECTION 3 — NEW BUGS FOUND**
 
-1. **Knowledge Base Contradiction:** `finova-project-knowledge.md` Rule 15 says "Wallets screen uses slideRight", but Rule 34 says "AppGuide, AddTransaction, and Wallets ... explicitly utilize panDownManual".
+1. **Knowledge Base Contradiction:** `finotary-project-knowledge.md` Rule 15 says "Wallets screen uses slideRight", but Rule 34 says "AppGuide, AddTransaction, and Wallets ... explicitly utilize panDownManual".
 2. **Settings Profile Image Picker:** In `SettingsScreen.js`, Rule 22 states "Never use ImagePicker.MediaTypeOptions", but the code doesn't specify media types at all. Using `mediaTypes: ['images']` (SDK 55 syntax) is recommended for safety.
 
 ---
@@ -63,4 +63,4 @@
 ---
 
 ### **FINAL VERDICT: PASS WITH PATCHES**
-The application architecture is robust. Once the `WalletsScreen` state and transition bugs are patched, the app will meet 100% of the v3.0.2 Deep QA requirements.
+The application architecture is robust. Once the `WalletsScreen` state and transition bugs are patched, the app will meet 100% of the v1.0.1 Deep QA requirements.

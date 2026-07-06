@@ -1,5 +1,5 @@
 // src/screens/LoginScreen.js
-// Finova v3.0 — Log In via JSON, Encrypted, or CSV backup
+// Finotary v1.0.1 — Log In via JSON, Encrypted, or CSV backup
 
 import React, { useState } from 'react';
 import {
@@ -18,10 +18,11 @@ const { width, height } = Dimensions.get('window');
 function decryptJson(encStr, password) {
   if (!encStr) return null;
   
-  if (encStr.startsWith('FINOVA_ENC:')) {
+  if (encStr.startsWith('FINOTARY_ENC:') || encStr.startsWith('FINTARY_ENC:') || encStr.startsWith('FINOVA_ENC:')) {
     try {
       const key = Array.from(password).map(c => c.charCodeAt(0));
-      const hex = encStr.slice(11);
+      const prefixLen = encStr.startsWith('FINOTARY_ENC:') ? 13 : encStr.startsWith('FINTARY_ENC:') ? 12 : 11;
+      const hex = encStr.slice(prefixLen);
       const chars = [];
       for (let i = 0; i < hex.length; i += 2) {
         const byte = parseInt(hex.slice(i, i + 2), 16);
@@ -31,10 +32,11 @@ function decryptJson(encStr, password) {
     } catch { return null; }
   }
   
-  if (encStr.startsWith('FINOVA_ENC2:')) {
+  if (encStr.startsWith('FINOTARY_ENC2:') || encStr.startsWith('FINTARY_ENC2:') || encStr.startsWith('FINOVA_ENC2:')) {
     try {
-      const salt = encStr.slice(12, 18);
-      const hex  = encStr.slice(18);
+      const prefixLen = encStr.startsWith('FINOTARY_ENC2:') ? 14 : encStr.startsWith('FINTARY_ENC2:') ? 13 : 12;
+      const salt = encStr.slice(prefixLen, prefixLen + 6);
+      const hex  = encStr.slice(prefixLen + 6);
       let hash = 0;
       for (let i = 0; i < password.length; i++) hash = (hash << 5) - hash + password.charCodeAt(i);
       const key = Array.from(password + salt + hash).map(c => c.charCodeAt(0));
@@ -55,7 +57,7 @@ function decryptJson(encStr, password) {
 
 // ─── CSV Parser ──────────────────────────────────────────────────────────────
 const parseCsvBackup = (csvStr) => {
-  const lines = csvStr.split('\n').filter(l => l.trim());
+  const lines = csvStr.split('\n').filter(l => l.trim() && !l.startsWith('#'));
   if (lines.length < 2) return null;
   const transactions = [];
   const wallets = [DEFAULT_WALLET];
@@ -97,7 +99,7 @@ const parseCsvBackup = (csvStr) => {
   }
   return {
     transactions,
-    settings: { name: 'Restored User', currency: '₹', darkMode: false, isPro: false },
+    settings: { name: 'Restored User', currency: '₹', darkMode: false },
     wallets,
     activeWalletId: 'default',
     customCategories: { expense: [], income: [] }
@@ -191,7 +193,7 @@ export default function LoginScreen({ navigation }) {
       const fileUri = result.assets[0].uri;
       const content = await FileSystem.readAsStringAsync(fileUri);
 
-      if (content.startsWith('FINOVA_ENC:') || content.startsWith('FINOVA_ENC2:')) {
+      if (content.startsWith('FINOTARY_ENC:') || content.startsWith('FINOTARY_ENC2:') || content.startsWith('FINTARY_ENC:') || content.startsWith('FINTARY_ENC2:') || content.startsWith('FINOVA_ENC:') || content.startsWith('FINOVA_ENC2:')) {
         setPendingEnc(content);
         setDecryptOpen(true);
         setLoading(false);
@@ -209,7 +211,7 @@ export default function LoginScreen({ navigation }) {
 
     } catch (err) {
       setLoading(false);
-      setMessageModal({ type: 'error', title: 'Login Failed', message: 'Make sure you\'re using a valid Finova backup file (.json, .enc, or .csv).' });
+      setMessageModal({ type: 'error', title: 'Login Failed', message: 'Make sure you\'re using a valid Finotary backup file (.json, .enc, or .csv).' });
     }
   };
 
@@ -237,10 +239,10 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.iconWrap}><Text style={styles.iconEmoji}>🔐</Text></View>
           <Text style={styles.title}>Log In</Text>
           <View style={styles.titleAccent} />
-          <Text style={styles.body}>Restore your Finova account from a previously downloaded backup file (JSON, Encrypted, or CSV).</Text>
+          <Text style={styles.body}>Restore your Finotary account from a previously downloaded backup file (JSON, Encrypted, or CSV).</Text>
           <View style={styles.callout}>
             <Text style={styles.calloutIcon}>📂</Text>
-            <Text style={styles.calloutText}>Upload any <Text style={styles.calloutBold}>Finova backup file</Text> to recover your transactions and profile.</Text>
+            <Text style={styles.calloutText}>Upload any <Text style={styles.calloutBold}>Finotary backup file</Text> to recover your transactions and profile.</Text>
           </View>
           <TouchableOpacity style={[styles.btn, loading && styles.btnLoading]} onPress={handleLogin} disabled={loading}>
             {loading ? <ActivityIndicator color="#222629" /> : <Text style={styles.btnText}>Upload Backup File</Text>}

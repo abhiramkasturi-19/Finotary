@@ -1,5 +1,5 @@
 // src/screens/WalletsScreen.js
-// Finova v3.0 — Wallet manager: create, switch, archive, delete wallets
+// Finotary v1.0.1 — Wallet manager: create, switch, archive, delete wallets
 
 import React, { useState, useRef, useEffect } from 'react';
 import {
@@ -111,7 +111,7 @@ export default function WalletsScreen({ navigation }) {
   const {
     wallets, activeWalletId, switchWallet, addWallet,
     renameWallet, deleteWallet, archiveWallet, unarchiveWallet,
-    transactions, settings, isPro,
+    transactions, settings,
   } = useApp();
   const colors = settings.darkMode ? darkColors : lightColors;
   const s = makeStyles(colors);
@@ -157,12 +157,7 @@ export default function WalletsScreen({ navigation }) {
   };
 
   const handleCreate = (name, icon) => {
-    const result = addWallet(name, icon);
-    if (result === 'requires_pro') {
-      setNewModalOpen(false);
-      navigation.navigate('ProPaywall');
-      return;
-    }
+    addWallet(name, icon);
     setNewModalOpen(false);
   };
 
@@ -269,13 +264,12 @@ export default function WalletsScreen({ navigation }) {
           {/* New wallet button */}
           <TouchableOpacity
             style={s.newBtn}
-            onPress={() => isPro ? setNewModalOpen(true) : navigation.navigate('ProPaywall')}
+            onPress={() => setNewModalOpen(true)}
             activeOpacity={0.82}
           >
             <Text style={s.newBtnIcon}>＋</Text>
             <View style={{ flex: 1 }}>
               <Text style={s.newBtnText}>New Wallet</Text>
-              {!isPro && <Text style={s.newBtnHint}>🔒 Pro feature</Text>}
             </View>
           </TouchableOpacity>
 

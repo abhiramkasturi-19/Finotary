@@ -1,6 +1,6 @@
 {
-  "name": "finova",
-  "version": "3.0.6",
+  "name": "finotary",
+  "version": "1.0.1",
   "main": "index.js",
   "scripts": {
     "start": "expo start",

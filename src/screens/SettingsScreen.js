@@ -1,5 +1,5 @@
 // src/screens/SettingsScreen.js
-// Finova v3.0 — Pro badge · App Lock · CSV Export · Passcode Export · Wallets · Upgrade row
+// Finotary v1.0.1 — Pro badge · App Lock · CSV Export · Passcode Export · Wallets · Upgrade row
 
 import React, { useState } from 'react';
 import {
@@ -15,6 +15,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
 import { useApp, DEFAULT_WALLET } from '../context/AppContext';
+import { getCat } from '../data/categories';
 import { lightColors, darkColors, spacing, radius, fonts } from '../theme/theme';
 
 const { width, height } = Dimensions.get('window');
@@ -43,17 +44,18 @@ function encryptJson(jsonStr, password) {
       const shifted = (c.charCodeAt(0) + i) % 256;
       return (shifted ^ k).toString(16).padStart(2, '0');
     }).join('');
-    return 'FINOVA_ENC2:' + salt + hex;
+    return 'FINOTARY_ENC2:' + salt + hex;
   } catch { return null; }
 }
 
 function decryptJson(encStr, password) {
   if (!encStr) return null;
 
-  if (encStr.startsWith('FINOVA_ENC:')) {
+  if (encStr.startsWith('FINOTARY_ENC:') || encStr.startsWith('FINTARY_ENC:') || encStr.startsWith('FINOVA_ENC:')) {
     try {
       const key = Array.from(password).map(c => c.charCodeAt(0));
-      const hex = encStr.slice(11);
+      const prefixLen = encStr.startsWith('FINOTARY_ENC:') ? 13 : encStr.startsWith('FINTARY_ENC:') ? 12 : 11;
+      const hex = encStr.slice(prefixLen);
       const chars = [];
       for (let i = 0; i < hex.length; i += 2) {
         const byte = parseInt(hex.slice(i, i + 2), 16);
@@ -63,10 +65,11 @@ function decryptJson(encStr, password) {
     } catch { return null; }
   }
 
-  if (encStr.startsWith('FINOVA_ENC2:')) {
+  if (encStr.startsWith('FINOTARY_ENC2:') || encStr.startsWith('FINTARY_ENC2:') || encStr.startsWith('FINOVA_ENC2:')) {
     try {
-      const salt = encStr.slice(12, 18);
-      const hex = encStr.slice(18);
+      const prefixLen = encStr.startsWith('FINOTARY_ENC2:') ? 14 : encStr.startsWith('FINTARY_ENC2:') ? 13 : 12;
+      const salt = encStr.slice(prefixLen, prefixLen + 6);
+      const hex = encStr.slice(prefixLen + 6);
       let hash = 0;
       for (let i = 0; i < password.length; i++) hash = (hash << 5) - hash + password.charCodeAt(i);
       const key = Array.from(password + salt + hash).map(c => c.charCodeAt(0));
@@ -87,7 +90,7 @@ function decryptJson(encStr, password) {
 
 // ─── CSV Parser ──────────────────────────────────────────────────────────────
 const parseCsvBackup = (csvStr, existingWallets = []) => {
-  const lines = csvStr.split('\n').filter(l => l.trim());
+  const lines = csvStr.split('\n').filter(l => l.trim() && !l.startsWith('#'));
   if (lines.length < 2) return null;
   const transactions = [];
   const wallets = [...existingWallets];
@@ -181,7 +184,7 @@ function PinSetupModal({ visible, onCancel, onSave }) {
             <View style={cm.handle} />
             <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔒</Text></View>
             <Text style={cm.title}>{step === 1 ? 'Set App PIN' : 'Confirm PIN'}</Text>
-            <Text style={cm.body}>{step === 1 ? 'Enter a 4-digit PIN to lock Finova.' : 'Re-enter your PIN to verify.'}</Text>
+            <Text style={cm.body}>{step === 1 ? 'Enter a 4-digit PIN to lock Finotary.' : 'Re-enter your PIN to verify.'}</Text>
             <TextInput style={[cm.pinInput, { marginBottom: 20 }]} value={step === 1 ? pin1 : pin2} onChangeText={step === 1 ? setPin1 : setPin2} keyboardType="number-pad" maxLength={4} secureTextEntry placeholder="····" placeholderTextColor="rgba(255,255,255,0.2)" autoFocus />
             {!!error && <Text style={cm.errorText}>{error}</Text>}
             <TouchableOpacity style={[cm.primaryBtn, { opacity: (step === 1 ? pin1 : pin2).length === 4 ? 1 : 0.5 }]} onPress={step === 1 ? handleNext : handleConfirm} disabled={(step === 1 ? pin1 : pin2).length !== 4}>
@@ -261,7 +264,7 @@ function DecryptImportModal({ visible, onCancel, onDecrypt }) {
 }
 
 // ─── Log Out Modal ────────────────────────────────────────────────────────────
-function LogoutModal({ visible, onCancel, onLogoutOnly, onDownloadLogout, isPro, onUpgrade }) {
+function LogoutModal({ visible, onCancel, onLogoutOnly, onDownloadLogout }) {
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onCancel}>
       <View style={cm.backdrop}>
@@ -275,9 +278,9 @@ function LogoutModal({ visible, onCancel, onLogoutOnly, onDownloadLogout, isPro,
 
           <TouchableOpacity
             style={[cm.primaryBtn, { flexDirection: 'column', alignItems: 'center', marginBottom: 12, paddingVertical: 14 }]}
-            onPress={() => isPro ? onDownloadLogout() : onUpgrade()}
+            onPress={onDownloadLogout}
           >
-            <Text style={cm.primaryBtnText}>📥 Log Out with Download {!isPro && '👑'}</Text>
+            <Text style={cm.primaryBtnText}>📥 Log Out with Download</Text>
             <Text style={{ fontFamily: 'Fungis-Regular', fontSize: 11, color: 'rgba(34,38,41,0.65)', marginTop: 2 }}>
               Saves a backup JSON file before logging out.
             </Text>
@@ -359,12 +362,233 @@ function RestoreConfirmModal({ visible, onCancel, onConfirm }) {
   );
 }
 
+// ─── CSV filter helpers ───────────────────────────────────────────────────────
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+const getYearsWithData = (transactions) => {
+  const years = new Set(transactions.map(t => new Date(t.date).getFullYear()));
+  return Array.from(years).sort((a, b) => b - a);
+};
+
+const filterByPeriod = (transactions, period, chosenYear, chosenMonth) => {
+  const now = new Date();
+  switch (period) {
+    case 'thisMonth':
+      return transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+      });
+    case 'thisYear':
+      return transactions.filter(t => new Date(t.date).getFullYear() === now.getFullYear());
+    case 'chooseYear':
+      if (chosenYear == null) return [];
+      return transactions.filter(t => new Date(t.date).getFullYear() === chosenYear);
+    case 'chooseMonth':
+      if (chosenYear == null || chosenMonth == null) return [];
+      return transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getFullYear() === chosenYear && d.getMonth() === chosenMonth;
+      });
+    case 'all':
+    default:
+      return transactions;
+  }
+};
+
+const filterByWallet = (transactions, walletId) => {
+  if (walletId === 'all') return transactions;
+  return transactions.filter(t => (t.walletId || 'default') === walletId);
+};
+
+const buildCsvFilename = (username) => {
+  const sanitized = (username || 'user').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  return `Finotary_${sanitized}_${dateStr}.csv`;
+};
+
+const generateCsvString = (transactions, wallets, username) => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  const localDateTime = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  
+  const metaHeader = `# Finotary CSV Export\n# Username: ${username || 'user'}\n# Exported At: ${localDateTime}\n# App Version: 1.0.1\n`;
+  const header = 'Date,Type,Category,Amount,Note,Wallet\n';
+  const rows = transactions.map(t => {
+    const w = (wallets || []).find(w => w.id === (t.walletId || 'default'))?.name || 'Personal';
+    const catLabel = t.customCategory?.trim() || getCat(t.category)?.label || t.category;
+    const cat = catLabel.replace(/"/g, '""');
+    const note = (t.note || '').replace(/"/g, '""');
+    const date = new Date(t.date).toLocaleDateString('en-IN');
+    return `"${date}","${t.type}","${cat}","${t.amount}","${note}","${w}"`;
+  }).join('\n');
+  return header + rows;
+};
+
+// ─── CSV Export Filter Modal ──────────────────────────────────────────────────
+function CsvExportModal({ visible, onCancel, onExport, transactions, wallets, username }) {
+  const [period, setPeriod] = useState('thisMonth');
+  const [chosenYear, setChosenYear] = useState(null);
+  const [chosenMonth, setChosenMonth] = useState(null);
+  const [walletId, setWalletId] = useState('all');
+
+  const years = getYearsWithData(transactions);
+
+  const periodFiltered = filterByPeriod(transactions, period, chosenYear, chosenMonth);
+  const finalFiltered = filterByWallet(periodFiltered, walletId);
+  const count = finalFiltered.length;
+
+  const periodLabel = {
+    thisMonth: 'This Month',
+    thisYear: 'This Year',
+    chooseYear: chosenYear != null ? `${chosenYear}` : 'Choose Year',
+    chooseMonth: (chosenYear != null && chosenMonth != null) ? `${MONTH_NAMES[chosenMonth]} ${chosenYear}` : 'Choose Month',
+    all: 'All Time',
+  }[period];
+  const walletLabel = walletId === 'all' ? 'All Wallets' : ((wallets || []).find(w => w.id === walletId)?.name || 'Wallet');
+
+  const needsYearPick = period === 'chooseYear' || period === 'chooseMonth';
+  const readyForExport =
+    (period !== 'chooseYear' || chosenYear != null) &&
+    (period !== 'chooseMonth' || (chosenYear != null && chosenMonth != null));
+
+  const selectPeriod = (p) => {
+    setPeriod(p);
+    if (p !== 'chooseYear' && p !== 'chooseMonth') { setChosenYear(null); setChosenMonth(null); }
+    else if (chosenYear == null && years.length) setChosenYear(years[0]);
+  };
+
+  const reset = () => { setPeriod('thisMonth'); setChosenYear(null); setChosenMonth(null); setWalletId('all'); };
+
+  const handleExport = () => {
+    if (!readyForExport || count === 0) return;
+    const filename = buildCsvFilename(username);
+    onExport(finalFiltered, filename);
+    reset();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={() => { reset(); onCancel(); }}>
+      <View style={cm.backdrop}>
+        <View style={cm.sheet}>
+          <View style={cm.handle} />
+          <View style={cm.iconRing}><Text style={cm.iconEmoji}>📊</Text></View>
+          <Text style={cm.title}>Export CSV</Text>
+          <Text style={cm.body}>Choose a time period and wallet to export.</Text>
+
+          <Text style={csv.label}>TIME PERIOD</Text>
+          <View style={csv.chipsWrap}>
+            {[
+              { key: 'thisMonth', label: 'This Month' },
+              { key: 'thisYear', label: 'This Year' },
+              { key: 'chooseYear', label: 'Choose Year' },
+              { key: 'chooseMonth', label: 'Choose Month' },
+              { key: 'all', label: 'All Time' },
+            ].map(opt => (
+              <TouchableOpacity
+                key={opt.key}
+                style={[csv.chip, period === opt.key && csv.chipActive]}
+                onPress={() => selectPeriod(opt.key)}
+              >
+                <Text style={[csv.chipText, period === opt.key && csv.chipTextActive]}>{opt.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {needsYearPick && (
+            <>
+              <Text style={csv.label}>YEAR</Text>
+              {years.length === 0 ? (
+                <Text style={csv.emptyHint}>No transaction history yet.</Text>
+              ) : (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }}>
+                  <View style={csv.chipsRow}>
+                    {years.map(y => (
+                      <TouchableOpacity key={y} style={[csv.chip, chosenYear === y && csv.chipActive]} onPress={() => setChosenYear(y)}>
+                        <Text style={[csv.chipText, chosenYear === y && csv.chipTextActive]}>{y}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              )}
+            </>
+          )}
+
+          {period === 'chooseMonth' && chosenYear != null && (
+            <>
+              <Text style={csv.label}>MONTH</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }}>
+                <View style={csv.chipsRow}>
+                  {MONTH_NAMES.map((m, i) => (
+                    <TouchableOpacity key={m} style={[csv.chip, chosenMonth === i && csv.chipActive]} onPress={() => setChosenMonth(i)}>
+                      <Text style={[csv.chipText, chosenMonth === i && csv.chipTextActive]}>{m.slice(0, 3)}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </>
+          )}
+
+          <Text style={csv.label}>WALLET</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }}>
+            <View style={csv.chipsRow}>
+              <TouchableOpacity style={[csv.chip, walletId === 'all' && csv.chipActive]} onPress={() => setWalletId('all')}>
+                <Text style={[csv.chipText, walletId === 'all' && csv.chipTextActive]}>All Wallets</Text>
+              </TouchableOpacity>
+              {(wallets || []).map(w => (
+                <TouchableOpacity key={w.id} style={[csv.chip, walletId === w.id && csv.chipActive]} onPress={() => setWalletId(w.id)}>
+                  <Text style={[csv.chipText, walletId === w.id && csv.chipTextActive]}>{w.icon} {w.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+
+          <View style={csv.previewBox}>
+            <Text style={csv.previewText}>{periodLabel} · {walletLabel}</Text>
+            <Text style={[csv.previewCount, count === 0 && csv.previewCountZero]}>
+              {readyForExport ? `${count} transaction${count === 1 ? '' : 's'}` : 'Pick a year to continue'}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={[cm.primaryBtn, (!readyForExport || count === 0) && { opacity: 0.4 }]}
+            onPress={handleExport}
+            disabled={!readyForExport || count === 0}
+          >
+            <Text style={cm.primaryBtnText}>Download CSV</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={cm.ghostBtn} onPress={() => { reset(); onCancel(); }}><Text style={cm.ghostBtnText}>Cancel</Text></TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const csv = StyleSheet.create({
+  label: { fontFamily: 'Fungis-Bold', fontSize: 10, letterSpacing: 1, color: 'rgba(255,255,255,0.4)', marginBottom: 8, marginTop: 4 },
+  chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
+  chipsRow: { flexDirection: 'row', gap: 8, paddingBottom: 12 },
+  chip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(174,183,132,0.3)', backgroundColor: 'rgba(174,183,132,0.06)' },
+  chipActive: { backgroundColor: '#AEB784', borderColor: '#AEB784' },
+  chipText: { fontFamily: 'Fungis-Regular', fontSize: 12, color: 'rgba(255,255,255,0.6)' },
+  chipTextActive: { fontFamily: 'Fungis-Bold', color: '#222629' },
+  emptyHint: { fontFamily: 'Fungis-Regular', fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 12 },
+  previewBox: { backgroundColor: 'rgba(174,183,132,0.08)', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(174,183,132,0.2)', padding: 14, marginTop: 8, marginBottom: 4 },
+  previewText: { fontFamily: 'Fungis-Bold', fontSize: 13, color: '#FFFFFF', marginBottom: 4 },
+  previewCount: { fontFamily: 'Fungis-Regular', fontSize: 12, color: '#AEB784' },
+  previewCountZero: { color: '#D4918F' },
+});
+
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function SettingsScreen({ navigation }) {
   const {
     transactions, settings, customCategories,
     wallets, activeWalletId,
-    updateSettings, toggleDarkMode, updatePro, importData, dispatch, isPro, state,
+    updateSettings, toggleDarkMode, importData, dispatch, state,
     enterDemo, exitDemo, isDemoMode,
   } = useApp();
 
@@ -382,6 +606,7 @@ export default function SettingsScreen({ navigation }) {
   const [pendingEncContent, setPendingEncContent] = useState('');
   const [restoreConfirmData, setRestoreConfirmData] = useState(null);
   const [messageModal, setMessageModal] = useState(null);
+  const [csvModalOpen, setCsvModalOpen] = useState(false);
 
   const colors = settings.darkMode ? darkColors : lightColors;
   const overlayColor = settings.darkMode ? 'rgba(0,0,0,0.82)' : 'rgba(44,51,32,0.55)';
@@ -400,25 +625,28 @@ export default function SettingsScreen({ navigation }) {
 
   const handleDownload = async () => {
     try {
-      const data = JSON.stringify({ transactions, settings, customCategories, wallets, activeWalletId }, null, 2);
-      const fileUri = FileSystem.cacheDirectory + 'finova_backup.json';
+      const exportMeta = {
+        username: settings.name || '',
+        exportedAt: new Date().toISOString(),
+        appVersion: '1.0.1'
+      };
+      const data = JSON.stringify({ exportMeta, transactions, settings, customCategories, wallets, activeWalletId }, null, 2);
+      const sanitized = (settings.name || 'user').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const filename = `Finotary_${sanitized}_${dateStr}.json`;
+      const fileUri = FileSystem.cacheDirectory + filename;
       await FileSystem.writeAsStringAsync(fileUri, data);
-      await Sharing.shareAsync(fileUri, { mimeType: 'application/json', dialogTitle: 'Save Finova backup' });
+      await Sharing.shareAsync(fileUri, { mimeType: 'application/json', dialogTitle: 'Save Finotary backup' });
     } catch { setMessageModal({ type: 'error', title: 'Error', message: 'Failed to generate backup' }); }
   };
 
-  const handleCsvExport = async () => {
+  const handleCsvExportConfirm = async (filteredTransactions, filename) => {
+    setCsvModalOpen(false);
     try {
-      const header = 'Date,Type,Category,Amount,Note,Wallet\n';
-      const rows = transactions.map(t => {
-        const w = (wallets || []).find(w => w.id === (t.walletId || 'default'))?.name || 'Personal';
-        const cat = (t.customCategory?.trim() || t.category).replace(/"/g, '""');
-        const note = (t.note || '').replace(/"/g, '""');
-        const date = new Date(t.date).toLocaleDateString('en-IN');
-        return `"${date}","${t.type}","${cat}","${t.amount}","${note}","${w}"`;
-      }).join('\n');
-      const fileUri = FileSystem.cacheDirectory + 'finova_transactions.csv';
-      await FileSystem.writeAsStringAsync(fileUri, header + rows);
+      const csvBody = generateCsvString(filteredTransactions, wallets, settings.name);
+      const fileUri = FileSystem.cacheDirectory + filename;
+      await FileSystem.writeAsStringAsync(fileUri, csvBody);
       await Sharing.shareAsync(fileUri, { mimeType: 'text/csv', dialogTitle: 'Export CSV' });
     } catch { setMessageModal({ type: 'error', title: 'Error', message: 'Failed to export CSV' }); }
   };
@@ -426,10 +654,19 @@ export default function SettingsScreen({ navigation }) {
   const handlePasscodeExport = async (password) => {
     setPassExportOpen(false);
     try {
-      const raw = JSON.stringify({ transactions, settings, customCategories, wallets, activeWalletId });
+      const exportMeta = {
+        username: settings.name || '',
+        exportedAt: new Date().toISOString(),
+        appVersion: '1.0.1'
+      };
+      const raw = JSON.stringify({ exportMeta, transactions, settings, customCategories, wallets, activeWalletId });
       const enc = encryptJson(raw, password);
       if (!enc) throw new Error();
-      const fileUri = FileSystem.cacheDirectory + 'finova_backup.enc';
+      const sanitized = (settings.name || 'user').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const filename = `Finotary_${sanitized}_${dateStr}.enc`;
+      const fileUri = FileSystem.cacheDirectory + filename;
       await FileSystem.writeAsStringAsync(fileUri, enc);
       await Sharing.shareAsync(fileUri, { mimeType: 'application/octet-stream', dialogTitle: 'Save encrypted backup' });
     } catch { setMessageModal({ type: 'error', title: 'Error', message: 'Encryption failed' }); }
@@ -441,7 +678,7 @@ export default function SettingsScreen({ navigation }) {
       if (result.canceled) return;
       const content = await FileSystem.readAsStringAsync(result.assets[0].uri);
 
-      if (content.startsWith('FINOVA_ENC:')) {
+      if (content.startsWith('FINOTARY_ENC:') || content.startsWith('FINOTARY_ENC2:') || content.startsWith('FINTARY_ENC:') || content.startsWith('FINTARY_ENC2:') || content.startsWith('FINOVA_ENC:') || content.startsWith('FINOVA_ENC2:')) {
         setPendingEncContent(content);
         setDecryptModalOpen(true);
         return;
@@ -548,7 +785,6 @@ export default function SettingsScreen({ navigation }) {
                     <View style={s.profileInfo}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                         <Text style={s.profileName}>{displayName}</Text>
-                        {isPro && <View style={s.proBadge}><Text style={s.proBadgeText}>👑 PRO</Text></View>}
                       </View>
                       <Text style={s.profileMeta}>{displayMeta}</Text>
                       {activeWallet && activeWalletId !== 'default' && <Text style={s.profileWallet}>{activeWallet.icon} {activeWallet.name}</Text>}
@@ -587,11 +823,11 @@ export default function SettingsScreen({ navigation }) {
                 <View style={s.rowInfo}><Text style={s.rowLabel}>Dark Mode</Text></View>
                 <Switch value={settings.darkMode} onValueChange={toggleDarkMode} trackColor={{ false: colors.border, true: colors.accentDark }} thumbColor={settings.darkMode ? colors.accent : colors.surface2} />
               </View>
-              <TouchableOpacity style={[s.row, { borderBottomWidth: 0 }]} onPress={() => !isPro && navigation.navigate('ProPaywall')} activeOpacity={0.7}>
+              <View style={[s.row, { borderBottomWidth: 0 }]}>
                 <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>🔒</Text></View>
                 <View style={s.rowInfo}><Text style={s.rowLabel}>App Lock</Text><Text style={s.rowHint}>{settings.appLockEnabled ? 'Active' : 'Locked'}</Text></View>
-                {isPro ? <Switch value={settings.appLockEnabled} onValueChange={v => v ? setPinSetupOpen(true) : updateSettings({ appLockEnabled: false, appLockPin: '' })} /> : <Text style={s.rowMuted}>›</Text>}
-              </TouchableOpacity>
+                <Switch value={settings.appLockEnabled} onValueChange={v => v ? setPinSetupOpen(true) : updateSettings({ appLockEnabled: false, appLockPin: '' })} trackColor={{ false: colors.border, true: colors.accentDark }} thumbColor={settings.appLockEnabled ? colors.accent : colors.surface2} />
+              </View>
             </View>
 
             <TouchableOpacity style={s.sectionHeader} onPress={() => setShowDataManager(!showDataManager)} activeOpacity={0.7}>
@@ -611,20 +847,17 @@ export default function SettingsScreen({ navigation }) {
                     <View style={s.rowInfo}><Text style={s.rowLabel}>Try Demo</Text><Text style={s.rowHint}>Explore with sample data</Text></View>
                   </TouchableOpacity>
                 )}
-                <TouchableOpacity style={s.row} onPress={isPro ? handleDownload : () => navigation.navigate('ProPaywall')} activeOpacity={0.7}>
+                <TouchableOpacity style={s.row} onPress={handleDownload} activeOpacity={0.7}>
                   <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>📥</Text></View>
                   <View style={s.rowInfo}><Text style={s.rowLabel}>Backup (JSON)</Text><Text style={s.rowHint}>Full account recovery</Text></View>
-                  {!isPro && <Text style={s.rowMuted}>›</Text>}
                 </TouchableOpacity>
-                <TouchableOpacity style={s.row} onPress={isPro ? handleCsvExport : () => navigation.navigate('ProPaywall')} activeOpacity={0.7}>
+                <TouchableOpacity style={s.row} onPress={() => setCsvModalOpen(true)} activeOpacity={0.7}>
                   <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>📊</Text></View>
                   <View style={s.rowInfo}><Text style={s.rowLabel}>Export CSV</Text><Text style={s.rowHint}>For Excel / Sheets</Text></View>
-                  {!isPro && <Text style={s.rowMuted}>›</Text>}
                 </TouchableOpacity>
-                <TouchableOpacity style={s.row} onPress={isPro ? () => setPassExportOpen(true) : () => navigation.navigate('ProPaywall')} activeOpacity={0.7}>
+                <TouchableOpacity style={s.row} onPress={() => setPassExportOpen(true)} activeOpacity={0.7}>
                   <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>🔐</Text></View>
                   <View style={s.rowInfo}><Text style={s.rowLabel}>Passcode Export</Text><Text style={s.rowHint}>Encrypted .enc file</Text></View>
-                  {!isPro && <Text style={s.rowMuted}>›</Text>}
                 </TouchableOpacity>
                 <TouchableOpacity style={s.row} onPress={handleUpload} activeOpacity={0.7}>
                   <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>📤</Text></View>
@@ -644,17 +877,11 @@ export default function SettingsScreen({ navigation }) {
                 <View style={s.rowInfo}><Text style={s.rowLabel}>Wallets</Text></View>
                 <Text style={s.rowMuted}>›</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={s.row} onPress={() => navigation.navigate('AppGuide')} activeOpacity={0.7}>
+              <TouchableOpacity style={[s.row, { borderBottomWidth: 0 }]} onPress={() => navigation.navigate('AppGuide')} activeOpacity={0.7}>
                 <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>📖</Text></View>
                 <View style={s.rowInfo}><Text style={s.rowLabel}>App Guide</Text></View>
                 <Text style={s.rowMuted}>›</Text>
               </TouchableOpacity>
-              {!isPro && (
-                <TouchableOpacity style={[s.row, { borderBottomWidth: 0 }]} onPress={() => navigation.navigate('ProPaywall')} activeOpacity={0.7}>
-                  <View style={[s.iconBox, { backgroundColor: '#AEB78422' }]}><Text>👑</Text></View>
-                  <View style={s.rowInfo}><Text style={[s.rowLabel, { color: '#AEB784' }]}>Upgrade to Pro</Text></View>
-                </TouchableOpacity>
-              )}
             </View>
 
             <TouchableOpacity style={s.logoutBtn} onPress={() => setLogoutModalOpen(true)} activeOpacity={0.8}><Text style={s.logoutText}>Log Out</Text></TouchableOpacity>
@@ -662,7 +889,7 @@ export default function SettingsScreen({ navigation }) {
             <View style={s.creditBlock}>
               <Text style={s.creditMadeBy}>crafted by</Text>
               <Text style={s.creditName}>Abhiram Kasturi</Text>
-              <Text style={s.creditFinova}>Finova · v3.0.6</Text>
+              <Text style={s.creditFinotary}>Finotary · v1.0.1</Text>
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -673,14 +900,17 @@ export default function SettingsScreen({ navigation }) {
         onCancel={() => setLogoutModalOpen(false)}
         onLogoutOnly={performLogout}
         onDownloadLogout={handleDownloadThenLogout}
-        isPro={isPro}
-        onUpgrade={() => {
-          setLogoutModalOpen(false);
-          navigation.navigate('ProPaywall');
-        }}
       />
       <ClearDataModal visible={clearModalOpen} onCancel={() => setClearModalOpen(false)} onConfirm={executeClear} />
       <PinSetupModal visible={pinSetupOpen} onCancel={() => setPinSetupOpen(false)} onSave={p => { updateSettings({ appLockEnabled: true, appLockPin: p }); setPinSetupOpen(false); }} />
+      <CsvExportModal
+        visible={csvModalOpen}
+        onCancel={() => setCsvModalOpen(false)}
+        onExport={handleCsvExportConfirm}
+        transactions={transactions}
+        wallets={wallets}
+        username={settings.name}
+      />
       <PasscodeExportModal visible={passExportOpen} onCancel={() => setPassExportOpen(false)} onExport={handlePasscodeExport} />
       <DecryptImportModal visible={decryptModalOpen} onCancel={() => { setDecryptModalOpen(false); setPendingEncContent(''); }} onDecrypt={handleDecryptImport} />
       <RestoreConfirmModal visible={!!restoreConfirmData} onCancel={() => setRestoreConfirmData(null)} onConfirm={confirmRestore} />
@@ -749,7 +979,7 @@ const makeStyles = (colors) => StyleSheet.create({
   creditBlock: { alignItems: 'center', paddingBottom: 40 },
   creditMadeBy: { fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 1 },
   creditName: { fontSize: 16, color: '#AEB784', fontFamily: fonts.heavy, marginTop: 4 },
-  creditFinova: { fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 4 },
+  creditFinotary: { fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 4 },
 });
 
 const cm = StyleSheet.create({

@@ -1,5 +1,5 @@
 // src/screens/DataInfoScreen.js
-// Finova v2.5 — Onboarding Page 3
+// Finotary v2.5 — Onboarding Page 3
 // Data management explainer → saves hasOnboarded and enters main app
 
 import React from 'react';
@@ -65,7 +65,7 @@ export default function DataInfoScreen({ navigation }) {
           <View style={styles.titleAccent} />
 
           <Text style={styles.intro}>
-            Finova stores everything privately on your device — nothing leaves without you knowing.
+            Finotary stores everything privately on your device — nothing leaves without you knowing.
             Head to <Text style={styles.highlight}>Settings → Data Management</Text> whenever you need to:
           </Text>
 
@@ -84,7 +84,7 @@ export default function DataInfoScreen({ navigation }) {
           </Text>
 
           <TouchableOpacity style={styles.btn} onPress={handleEnterApp} activeOpacity={0.84}>
-            <Text style={styles.btnText}>Enter Finova  →</Text>
+            <Text style={styles.btnText}>Enter Finotary  →</Text>
           </TouchableOpacity>
 
           <View style={{ height: 40 }} />

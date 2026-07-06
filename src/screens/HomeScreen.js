@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.js
-// Finova v3.0 — wallet-aware (activeTransactions + wallet name on card)
+// Finotary v1.0.1 — wallet-aware (activeTransactions + wallet name on card)
 
 import React from 'react';
 import {

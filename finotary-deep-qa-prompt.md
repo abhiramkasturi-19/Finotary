@@ -1,4 +1,4 @@
-# Finova v3.0.2 — Deep QA & Exhaustive Bug Hunt Prompt
+# Finotary v1.0.1 — Deep QA & Exhaustive Bug Hunt Prompt
 ## Run this MULTIPLE TIMES across FREE mode, PRO mode, and DEMO mode
 
 ---
@@ -7,11 +7,11 @@
 
 ---
 
-*You are a senior React Native QA engineer and UI/UX specialist. Your job is to exhaustively test every pixel, every function, every edge case, and every flow in Finova v3.0.2. No detail is too small. Test the app three times in three modes: FREE, PRO, DEMO. For every single test item below, report PASS, FAIL, or BUG with full detail. If it fails, give the exact file, exact function name, and exact fix.*
+*You are a senior React Native QA engineer and UI/UX specialist. Your job is to exhaustively test every pixel, every function, every edge case, and every flow in Finotary v1.0.1. No detail is too small. Test the app three times in three modes: FREE, PRO, DEMO. For every single test item below, report PASS, FAIL, or BUG with full detail. If it fails, give the exact file, exact function name, and exact fix.*
 
 ---
 
-## RUN 1 — FREE MODE (isPro: false, fresh install state)
+## RUN 1 — TEST MODE
 
 ---
 
@@ -58,7 +58,7 @@
 ---
 
 ### F4. DATA INFO SCREEN
-- [ ] "Enter Finova →" button navigates to Main via `navigation.reset`
+- [ ] "Enter Finotary →" button navigates to Main via `navigation.reset`
 - [ ] After tapping, hasOnboarded is set to 'true'
 - [ ] App reloads directly to Main on next launch
 - [ ] Screen is always dark
@@ -68,7 +68,7 @@
 ### F5. LOGIN SCREEN
 - [ ] Upload button opens document picker
 - [ ] Uploading a valid .json backup → validates → imports data → resets to Main
-- [ ] Uploading an .enc file → auto-detects FINOVA_ENC: or FINOVA_ENC2: prefix → opens DecryptImportModal
+- [ ] Uploading an .enc file → auto-detects FINOTARY_ENC: or FINOTARY_ENC2: prefix → opens DecryptImportModal
 - [ ] DecryptImportModal: correct password → imports and goes to Main
 - [ ] DecryptImportModal: wrong password → custom error modal shown (no native Alert.alert)
 - [ ] Uploading invalid JSON → custom error modal (no native Alert.alert)
@@ -184,7 +184,7 @@
 - [ ] Upload / Restore — always available in free mode — opens document picker
 - [ ] Clear All Data → opens custom ClearDataModal (NO native Alert.alert)
 - [ ] ClearDataModal: Cancel closes modal, data unchanged
-- [ ] ClearDataModal: Confirm clears transactions but preserves: isPro, customCategories, appLockEnabled, appLockPin, wallets, activeWalletId, hasOnboarded
+- [ ] ClearDataModal: Confirm clears transactions but preserves: customCategories, appLockEnabled, appLockPin, wallets, activeWalletId, hasOnboarded
 - [ ] executeClear uses AsyncStorage.setItem — NOT AsyncStorage.clear()
 - [ ] Wallets row → navigates to WalletsScreen
 - [ ] App Guide row → navigates to AppGuideScreen (panDownManual, no flash)
@@ -195,7 +195,7 @@
 - [ ] "Log Out + Download" for free user → routes to ProPaywall (not download)
 - [ ] "Log Out without Download" → clears all data including hasOnboarded → navigates to WelcomeScreen
 - [ ] After logout, reopening app shows WelcomeScreen
-- [ ] Creator credit "crafted by Abhiram Kasturi" and "Finova · v3.0.2" always visible at bottom
+- [ ] Creator credit "crafted by Abhiram Kasturi" and "Finotary · v1.0.1" always visible at bottom
 - [ ] ScrollView has paddingBottom:100 so bottom items clear the tab bar
 
 ---
@@ -216,11 +216,11 @@
 - [ ] Screen opens with slide-up animation — no white/grey flash
 - [ ] Background is exactly #090A09 (deep black) — NOT #1A1D1A
 - [ ] "✕" close button visible top right
-- [ ] "finova" logo text visible — Heavy font, ~64px, gold colour
+- [ ] "finotary" logo text visible — Heavy font, ~64px, gold colour
 - [ ] Tagline visible below logo
 - [ ] Free card shows: ₹0 forever, 4 base features, "Current" marker
 - [ ] Pro card shows: ₹49 one-time, "LIMITED TIME" badge, 5 Pro features, "Unlock Pro" CTA
-- [ ] "Unlock Finova Pro →" button triggers 900ms delay then isPro becomes true
+- [ ] "Unlock Finotary Pro →" button triggers 900ms delay then isPro becomes true
 - [ ] After unlock: all Pro features immediately available without restart
 - [ ] "Restore Purchase" link visible at bottom
 - [ ] Legal footer text visible
@@ -230,7 +230,7 @@
 
 ---
 
-## RUN 2 — PRO MODE (isPro: true, unlocked via paywall)
+## RUN 2 — TEST MODE
 
 ---
 
@@ -242,15 +242,15 @@
 - [ ] Mismatched PINs → error message shown, not Alert.alert
 - [ ] Correct PIN confirm → Lock enabled, modal closes
 - [ ] App Lock toggle OFF → clears appLockEnabled and appLockPin
-- [ ] Backup (JSON) → generates and shares finova_backup.json file
+- [ ] Backup (JSON) → generates and shares finotary_backup.json file
 - [ ] JSON backup contains: transactions, settings, customCategories, wallets, activeWalletId
-- [ ] CSV Export → generates finova_transactions.csv with correct columns: Date, Type, Category, Amount, Note, Wallet
+- [ ] CSV Export → generates finotary_transactions.csv with correct columns: Date, Type, Category, Amount, Note, Wallet
 - [ ] CSV file shares correctly via system share sheet
 - [ ] Empty transactions → produces valid empty CSV — no crash
 - [ ] Passcode Export → opens PasscodeExportModal
 - [ ] PasscodeExportModal: minimum 4 character password enforced
 - [ ] PasscodeExportModal: password mismatch → error shown
-- [ ] Passcode Export produces .enc file with FINOVA_ENC2: prefix
+- [ ] Passcode Export produces .enc file with FINOTARY_ENC2: prefix
 - [ ] .enc file shares via system share sheet
 - [ ] Upload .enc file back → auto-detected → DecryptImportModal opens
 - [ ] Correct password → decrypts and restores correctly
@@ -264,7 +264,7 @@
 - [ ] Setting a PIN: 4 digits required, confirmed
 - [ ] Sending app to background then foreground → PIN overlay appears
 - [ ] PIN overlay background is exactly #1A1D1A
-- [ ] "Finova" text in gold, "Enter your PIN" label shown
+- [ ] "Finotary" text in gold, "Enter your PIN" label shown
 - [ ] 4 dot indicators update as digits entered
 - [ ] Correct PIN → unlocks and shows app
 - [ ] Wrong PIN → shake animation fires (translateX sequence), PIN cleared
@@ -453,7 +453,7 @@
 - [ ] Every wallet has: id, name, icon, archived fields
 - [ ] Default wallet always exists with id: 'default'
 - [ ] customCategories has expense[] and income[] arrays
-- [ ] settings object always has all 8 fields: name, age, currency, darkMode, profileImage, isPro, appLockEnabled, appLockPin
+- [ ] settings object always has all 8 fields: name, age, currency, darkMode, profileImage, appLockEnabled, appLockPin
 
 ---
 

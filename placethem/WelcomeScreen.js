@@ -1,5 +1,5 @@
 // screens/WelcomeScreen.js
-// Finova v2.5 — Onboarding Page 1
+// Finotary v1.0.1 — Onboarding Page 1
 // Full-screen splash background, bottom shadow, headline, decorative lines, CTA
 
 import React from 'react';
@@ -37,7 +37,7 @@ export default function WelcomeScreen({ navigation }) {
         <View style={styles.content}>
 
           {/* Headline */}
-          <Text style={styles.headline}>Finova</Text>
+          <Text style={styles.headline}>Finotary</Text>
           <Text style={styles.tagline}>Your wealth, in full view.</Text>
 
           {/* Decorative lines — sit between headline & sub-headline */}

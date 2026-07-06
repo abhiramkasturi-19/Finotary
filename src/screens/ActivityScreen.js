@@ -1,5 +1,5 @@
 // src/screens/ActivityScreen.js
-// Finova v3.0 — Transaction search (Pro) · Wallet-aware filtering
+// Finotary v1.0.1 — Transaction search (Pro) · Wallet-aware filtering
 
 import React, { useMemo, useState, useRef } from 'react';
 import {
@@ -260,7 +260,7 @@ function TxnDetailModal({ txn, currency, onClose, colors, onEdit, onDelete, cust
 export default function ActivityScreen({ navigation }) {
   const {
     transactions, activeTransactions,
-    settings, deleteTransaction, customCategories, isPro,
+    settings, deleteTransaction, customCategories,
   } = useApp();
   const colors = settings.darkMode ? darkColors : lightColors;
   const cur    = settings.currency;
@@ -348,7 +348,6 @@ export default function ActivityScreen({ navigation }) {
   };
 
   const handleSearchPress = () => {
-    if (!isPro) { navigation.navigate('ProPaywall'); return; }
     if (searchOpen) { setSearchOpen(false); setSearchQuery(''); }
     else            { setSearchOpen(true); }
   };
@@ -424,12 +423,11 @@ export default function ActivityScreen({ navigation }) {
               <Path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" />
               <Path d="M21 21l-4.35-4.35" />
             </Svg>
-            {!isPro && <Text style={s.lockBadge}>🔒</Text>}
           </TouchableOpacity>
         </View>
 
-        {/* Search input — visible only when open and Pro */}
-        {searchOpen && isPro && (
+        {/* Search input — visible only when open */}
+        {searchOpen && (
           <View style={s.searchBox}>
             <Svg width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke={colors.textMuted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"

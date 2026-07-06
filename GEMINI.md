@@ -1,7 +1,7 @@
-# GEMINI.md — Finova Project Context
+# GEMINI.md — Finotary Project Context
 
 ## Project Overview
-**Finova** is a Personal Finance Management mobile application built with **React Native** and **Expo**. It is designed to track income and expenses, provide visual analysis via donut and line charts, and manage custom categories. The app supports a dynamic light/dark theme system and manual data backup/restore via JSON files.
+**Finotary** is a Personal Finance Management mobile application built with **React Native** and **Expo**. It is designed to track income and expenses, provide visual analysis via donut and line charts, and manage custom categories. The app supports a dynamic light/dark theme system and manual data backup/restore via JSON files.
 
 ### Tech Stack
 - **Framework:** Expo (SDK 55) / React Native
@@ -34,7 +34,7 @@
 - **Android Tab Fix:** The tab bar wrapper must have both `zIndex: 100` AND `elevation: 100` to prevent screen content from overlapping it.
 - **Inactive Screens:** Use `display: 'none'` (not `pointerEvents: 'none'`) to fully remove inactive tab screens from the render tree.
 - **White Flash Fix:** The `NavigationContainer` now uses a custom dark theme to prevent white flashes. All stack screen options include `contentStyle: { backgroundColor: '#111' }`.
-- **Modals:** `AddTransaction`, `AppGuide`, `ProPaywallScreen`, and `WalletsScreen` now use `presentation: 'transparentModal'` + a manual slide-up animation from the bottom. Note that all modal dismissals except AddTransaction are hard-coded to be instantaneous.
+- **Modals:** `AddTransaction`, `AppGuide`, and `WalletsScreen` now use `presentation: 'transparentModal'` + a manual slide-up animation from the bottom. Note that all modal dismissals except AddTransaction are hard-coded to be instantaneous.
 
 ### 3. Theming Rules (CRITICAL)
 - **Strict Rule:** NEVER `import { colors }` from the theme file into a component for static `StyleSheet.create` calls.
@@ -58,7 +58,7 @@
 
 ### 6. Backup & Restore
 - Implemented in `SettingsScreen.js` and `LoginScreen.js`.
-- **Export:** Supports full backup to `.json`, Pro users can export to `.csv` or a password-protected `.enc` file.
+- **Export:** Supports full backup to `.json`, `.csv` or a password-protected `.enc` file.
 - **Import:** Both screens now support restoring from `.json`, `.csv`, and `.enc` files, with a passcode prompt for encrypted backups.
 - Uses `expo-file-system/legacy` to avoid modern API deprecation errors in SDK 55.
 

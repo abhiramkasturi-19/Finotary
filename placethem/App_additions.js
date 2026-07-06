@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// App.js  —  ADDITIONS for Finova v2.5
+// App.js  —  ADDITIONS for Finotary v1.0.1
 // ─────────────────────────────────────────────────────────────────────────────
 // Instructions: Merge these additions into your existing App.js.
 // The goal is to: (a) check AsyncStorage on startup, and (b) show onboarding
@@ -86,7 +86,7 @@ const RootStack = createNativeStackNavigator();
           <RootStack.Screen name="DataInfo"      component={DataInfoScreen}      />
           {/*
             DataInfoScreen calls navigation.reset({ routes: [{ name: 'MainApp' }] })
-            when the user taps "Enter Finova", so we still need MainApp here.
+            when the user taps "Enter Finotary", so we still need MainApp here.
           */}
           <RootStack.Screen name="MainApp"       component={MainTabNavigator}    />
         </>

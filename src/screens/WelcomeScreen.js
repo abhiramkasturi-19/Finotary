@@ -1,5 +1,5 @@
 // src/screens/WelcomeScreen.js
-// Finova v2.6 — Onboarding Page 1 — Get Started + Log In
+// Finotary v1.0.1 — Onboarding Page 1 — Get Started + Log In
 
 import React from 'react';
 import {
@@ -35,7 +35,7 @@ export default function WelcomeScreen({ navigation }) {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.headline}>Finova</Text>
+          <Text style={styles.headline}>Finotary</Text>
           <Text style={styles.tagline}>Your Wealth, In Full View.</Text>
 
           <View style={styles.linesRow}>
