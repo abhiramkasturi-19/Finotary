@@ -22,7 +22,7 @@ const CURRENCIES = [
 ];
 const THEMES = [
   { label: '☀️  Light', value: 'light' },
-  { label: '🌙  Dark',  value: 'dark'  },
+  { label: '🌙  Dark', value: 'dark' },
 ];
 
 // Crop circle size and canvas dimensions
@@ -42,25 +42,19 @@ const TERMS_SECTIONS = [
     ],
   },
   {
-    heading: 'Section 3 — Pro Subscription & Payments',
-    body: [
-      'Finotary offers a one-time Pro upgrade priced at ₹199 (Indian Rupees). This is a non-refundable, lifetime unlock. The purchase is processed securely through Google Play. Once purchased, Pro features are permanently unlocked on your account. To restore a previous purchase on a new device, use the Restore Purchase option on the paywall screen.'
-    ],
-  },
-  {
-    heading: 'Section 4 — User Responsibilities',
+    heading: 'Section 3 — User Responsibilities',
     body: [
       'You are responsible for maintaining the security of your device and app lock PIN. You are responsible for regularly exporting and storing your backup files. Finotary is a personal finance tracking tool only — it is not a banking app, payment app, or financial advisory service.'
     ],
   },
   {
-    heading: 'Section 5 — Intellectual Property',
+    heading: 'Section 4 — Intellectual Property',
     body: [
       'Finotary, its design, code, and all assets are the intellectual property of Abhiram Kasturi. You may not copy, reverse engineer, redistribute, or resell any part of this app.'
     ],
   },
   {
-    heading: 'Section 6 — Disclaimer',
+    heading: 'Section 5 — Disclaimer',
     body: [
       'Finotary is provided as-is without any warranties. Abhiram Kasturi is not liable for any financial decisions made based on data shown in the app, or for any data loss resulting from device failure, app deletion, or failure to maintain backups.'
     ],
@@ -107,7 +101,7 @@ function TermsModal({ visible, onClose }) {
             <Text style={modal.intro}>
               Developer name: Abhiram Kasturi{'\n'}
               App name: Finotary{'\n'}
-              Last updated: March 2026
+              Last updated: July 2026
             </Text>
             {TERMS_SECTIONS.map((section, i) => (
               <View key={i} style={modal.section}>
@@ -158,14 +152,14 @@ function MessageModal({ visible, title, message, onClose }) {
 export default function CreateAccountScreen({ navigation }) {
   const { updateSettings } = useApp();
 
-  const [profileImage,     setProfileImage    ] = useState(null);
-  const [username,         setUsername        ] = useState('');
-  const [age,              setAge             ] = useState('');
-  const [selectedTheme,    setSelectedTheme   ] = useState('dark');
+  const [profileImage, setProfileImage] = useState(null);
+  const [username, setUsername] = useState('');
+  const [age, setAge] = useState('');
+  const [selectedTheme, setSelectedTheme] = useState('dark');
   const [selectedCurrency, setSelectedCurrency] = useState('INR');
-  const [agreed,           setAgreed          ] = useState(false);
-  const [termsVisible,     setTermsVisible    ] = useState(false);
-  const [msgData,          setMsgData         ] = useState(null); // {title, message}
+  const [agreed, setAgreed] = useState(false);
+  const [termsVisible, setTermsVisible] = useState(false);
+  const [msgData, setMsgData] = useState(null); // {title, message}
 
   const canProceed = username.trim().length > 0 && age.trim().length > 0 && agreed;
 
@@ -188,10 +182,10 @@ export default function CreateAccountScreen({ navigation }) {
 
   const handleContinue = () => {
     updateSettings({
-      name:         username.trim(),
-      age:          age.trim(),
-      darkMode:     selectedTheme === 'dark',
-      currency:     CURRENCY_SYMBOLS[selectedCurrency],
+      name: username.trim(),
+      age: age.trim(),
+      darkMode: selectedTheme === 'dark',
+      currency: CURRENCY_SYMBOLS[selectedCurrency],
       profileImage: profileImage || '',
     });
     navigation.navigate('DataInfo');
@@ -207,109 +201,109 @@ export default function CreateAccountScreen({ navigation }) {
         <SafeAreaView style={styles.safe}>
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.kav}>
             <ScrollView
-            contentContainerStyle={styles.scroll}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-              <Text style={styles.backText}>← Back</Text>
-            </TouchableOpacity>
+              contentContainerStyle={styles.scroll}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+                <Text style={styles.backText}>← Back</Text>
+              </TouchableOpacity>
 
-            <Text style={styles.title}>Create{'\n'}Account</Text>
-            <View style={styles.titleAccent} />
+              <Text style={styles.title}>Create{'\n'}Account</Text>
+              <View style={styles.titleAccent} />
 
-            {/* ── Profile Picture ── */}
-            <Text style={styles.label}>Profile Picture</Text>
-            <View style={styles.avatarRow}>
-              <TouchableOpacity style={styles.avatarWrap} onPress={pickProfileImage} activeOpacity={0.8}>
-                {profileImage
-                  ? <Image source={{ uri: profileImage }} style={styles.avatarImg} />
-                  : <View style={styles.avatarPlaceholder}>
+              {/* ── Profile Picture ── */}
+              <Text style={styles.label}>Profile Picture</Text>
+              <View style={styles.avatarRow}>
+                <TouchableOpacity style={styles.avatarWrap} onPress={pickProfileImage} activeOpacity={0.8}>
+                  {profileImage
+                    ? <Image source={{ uri: profileImage }} style={styles.avatarImg} />
+                    : <View style={styles.avatarPlaceholder}>
                       <Text style={styles.avatarInitials}>{initials}</Text>
                     </View>
-                }
-                <View style={styles.cameraBadge}><CameraIcon /></View>
+                  }
+                  <View style={styles.cameraBadge}><CameraIcon /></View>
+                </TouchableOpacity>
+                <View style={styles.avatarHintWrap}>
+                  <Text style={styles.avatarHint}>Tap to upload a photo</Text>
+                  <Text style={styles.avatarHintSub}>Optional — you can add or change this later in Settings.</Text>
+                </View>
+              </View>
+
+              {/* ── Username ── */}
+              <Text style={styles.label}>Username</Text>
+              <TextInput
+                style={styles.input} value={username} onChangeText={setUsername}
+                placeholder="What should we call you?" placeholderTextColor="rgba(255,255,255,0.30)"
+                autoCapitalize="words" maxLength={24} returnKeyType="next"
+              />
+
+              {/* ── Age ── */}
+              <Text style={styles.label}>Age</Text>
+              <TextInput
+                style={styles.input} value={age} onChangeText={v => setAge(v.replace(/[^0-9]/g, ''))}
+                placeholder="Your age" placeholderTextColor="rgba(255,255,255,0.30)"
+                keyboardType="number-pad" maxLength={3} returnKeyType="done"
+              />
+
+              {/* ── Theme ── */}
+              <Text style={styles.label}>Theme</Text>
+              <View style={styles.chipsRow}>
+                {THEMES.map(t => (
+                  <TouchableOpacity
+                    key={t.value}
+                    style={[styles.chip, selectedTheme === t.value && styles.chipActive]}
+                    onPress={() => setSelectedTheme(t.value)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.chipText, selectedTheme === t.value && styles.chipTextActive]}>
+                      {t.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* ── Currency ── */}
+              <Text style={styles.label}>Currency</Text>
+              <View style={styles.chipsRow}>
+                {CURRENCIES.map(c => (
+                  <TouchableOpacity
+                    key={c.code}
+                    style={[styles.chip, selectedCurrency === c.code && styles.chipActive]}
+                    onPress={() => setSelectedCurrency(c.code)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.chipText, selectedCurrency === c.code && styles.chipTextActive]}>
+                      {c.symbol} {c.code}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* ── Terms ── */}
+              <TouchableOpacity style={styles.termsRow} onPress={() => setAgreed(v => !v)} activeOpacity={0.75}>
+                <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
+                  {agreed && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={styles.termsText}>
+                  I agree to the{' '}
+                  <Text style={styles.termsLink} onPress={() => setTermsVisible(true)}>Terms & Privacy Policy</Text>
+                </Text>
               </TouchableOpacity>
-              <View style={styles.avatarHintWrap}>
-                <Text style={styles.avatarHint}>Tap to upload a photo</Text>
-                <Text style={styles.avatarHintSub}>Optional — you can add or change this later in Settings.</Text>
-              </View>
-            </View>
 
-            {/* ── Username ── */}
-            <Text style={styles.label}>Username</Text>
-            <TextInput
-              style={styles.input} value={username} onChangeText={setUsername}
-              placeholder="What should we call you?" placeholderTextColor="rgba(255,255,255,0.30)"
-              autoCapitalize="words" maxLength={24} returnKeyType="next"
-            />
+              {/* ── Continue ── */}
+              <TouchableOpacity
+                style={[styles.btn, !canProceed && styles.btnDisabled]}
+                onPress={handleContinue}
+                disabled={!canProceed}
+                activeOpacity={0.84}
+              >
+                <Text style={[styles.btnText, !canProceed && styles.btnTextDisabled]}>Continue</Text>
+              </TouchableOpacity>
 
-            {/* ── Age ── */}
-            <Text style={styles.label}>Age</Text>
-            <TextInput
-              style={styles.input} value={age} onChangeText={v => setAge(v.replace(/[^0-9]/g, ''))}
-              placeholder="Your age" placeholderTextColor="rgba(255,255,255,0.30)"
-              keyboardType="number-pad" maxLength={3} returnKeyType="done"
-            />
-
-            {/* ── Theme ── */}
-            <Text style={styles.label}>Theme</Text>
-            <View style={styles.chipsRow}>
-              {THEMES.map(t => (
-                <TouchableOpacity
-                  key={t.value}
-                  style={[styles.chip, selectedTheme === t.value && styles.chipActive]}
-                  onPress={() => setSelectedTheme(t.value)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={[styles.chipText, selectedTheme === t.value && styles.chipTextActive]}>
-                    {t.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {/* ── Currency ── */}
-            <Text style={styles.label}>Currency</Text>
-            <View style={styles.chipsRow}>
-              {CURRENCIES.map(c => (
-                <TouchableOpacity
-                  key={c.code}
-                  style={[styles.chip, selectedCurrency === c.code && styles.chipActive]}
-                  onPress={() => setSelectedCurrency(c.code)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={[styles.chipText, selectedCurrency === c.code && styles.chipTextActive]}>
-                    {c.symbol} {c.code}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {/* ── Terms ── */}
-            <TouchableOpacity style={styles.termsRow} onPress={() => setAgreed(v => !v)} activeOpacity={0.75}>
-              <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-                {agreed && <Text style={styles.checkmark}>✓</Text>}
-              </View>
-              <Text style={styles.termsText}>
-                I agree to the{' '}
-                <Text style={styles.termsLink} onPress={() => setTermsVisible(true)}>Terms & Privacy Policy</Text>
-              </Text>
-            </TouchableOpacity>
-
-            {/* ── Continue ── */}
-            <TouchableOpacity
-              style={[styles.btn, !canProceed && styles.btnDisabled]}
-              onPress={handleContinue}
-              disabled={!canProceed}
-              activeOpacity={0.84}
-            >
-              <Text style={[styles.btnText, !canProceed && styles.btnTextDisabled]}>Continue</Text>
-            </TouchableOpacity>
-
-            <View style={{ height: 40 }} />
-          </ScrollView>
-        </KeyboardAvoidingView>
+              <View style={{ height: 40 }} />
+            </ScrollView>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </ImageBackground>
 
@@ -329,23 +323,23 @@ export default function CreateAccountScreen({ navigation }) {
 // ── Screen Styles ─────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#222629' },
-  bg:   { flex: 1, width, height },
+  bg: { flex: 1, width, height },
   fullOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.90)' },
   safe: { flex: 1, paddingTop: -50, paddingBottom: -100 },
-  kav:  { flex: 1 },
+  kav: { flex: 1 },
   scroll: { paddingHorizontal: 28, paddingTop: 56 },
 
-  backBtn:  { marginBottom: 28 },
+  backBtn: { marginBottom: 28 },
   backText: { fontFamily: 'Fungis-Regular', fontSize: 15, color: 'rgba(255,255,255,0.55)' },
 
-  title:       { fontFamily: 'Fungis-Heavy', fontSize: 46, color: '#FFFFFF', lineHeight: 54, marginBottom: 14 },
+  title: { fontFamily: 'Fungis-Heavy', fontSize: 46, color: '#FFFFFF', lineHeight: 54, marginBottom: 14 },
   titleAccent: { width: 44, height: 3, backgroundColor: '#AEB784', borderRadius: 2, marginBottom: 32 },
 
   label: { fontFamily: 'Fungis-Bold', fontSize: 11, color: '#AEB784', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 },
 
-  avatarRow:  { flexDirection: 'row', alignItems: 'center', gap: 18, marginBottom: 28 },
+  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 18, marginBottom: 28 },
   avatarWrap: { position: 'relative' },
-  avatarImg:  { width: 80, height: 80, borderRadius: 40 },
+  avatarImg: { width: 80, height: 80, borderRadius: 40 },
   avatarPlaceholder: {
     width: 80, height: 80, borderRadius: 40,
     backgroundColor: 'rgba(174,183,132,0.20)',
@@ -361,8 +355,8 @@ const styles = StyleSheet.create({
     borderWidth: 2, borderColor: 'rgba(0,0,0,0.80)',
   },
   avatarHintWrap: { flex: 1 },
-  avatarHint:     { fontFamily: 'Fungis-Bold', fontSize: 14, color: '#FFFFFF', marginBottom: 4 },
-  avatarHintSub:  { fontFamily: 'Fungis-Regular', fontSize: 12, color: 'rgba(255,255,255,0.40)', lineHeight: 18 },
+  avatarHint: { fontFamily: 'Fungis-Bold', fontSize: 14, color: '#FFFFFF', marginBottom: 4 },
+  avatarHintSub: { fontFamily: 'Fungis-Regular', fontSize: 12, color: 'rgba(255,255,255,0.40)', lineHeight: 18 },
 
   input: {
     backgroundColor: 'rgba(255,255,255,0.07)',
@@ -371,22 +365,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Fungis-Regular', fontSize: 16, color: '#FFFFFF', marginBottom: 26,
   },
 
-  chipsRow:       { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 26 },
-  chip:           { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 100, borderWidth: 1, borderColor: 'rgba(174,183,132,0.35)', backgroundColor: 'rgba(255,255,255,0.04)' },
-  chipActive:     { backgroundColor: '#AEB784', borderColor: '#AEB784' },
-  chipText:       { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.65)' },
+  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 26 },
+  chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 100, borderWidth: 1, borderColor: 'rgba(174,183,132,0.35)', backgroundColor: 'rgba(255,255,255,0.04)' },
+  chipActive: { backgroundColor: '#AEB784', borderColor: '#AEB784' },
+  chipText: { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.65)' },
   chipTextActive: { fontFamily: 'Fungis-Bold', color: '#222629' },
 
-  termsRow:        { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 28 },
-  checkbox:        { width: 20, height: 20, borderRadius: 5, borderWidth: 1.5, borderColor: 'rgba(174,183,132,0.45)', backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  termsRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 28 },
+  checkbox: { width: 20, height: 20, borderRadius: 5, borderWidth: 1.5, borderColor: 'rgba(174,183,132,0.45)', backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   checkboxChecked: { backgroundColor: '#AEB784', borderColor: '#AEB784' },
-  checkmark:       { fontSize: 12, color: '#222629', fontWeight: '700' },
-  termsText:       { fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.45)' },
-  termsLink:       { fontFamily: 'Fungis-Bold', color: '#AEB784' },
+  checkmark: { fontSize: 12, color: '#222629', fontWeight: '700' },
+  termsText: { fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.45)' },
+  termsLink: { fontFamily: 'Fungis-Bold', color: '#AEB784' },
 
-  btn:             { backgroundColor: '#AEB784', paddingVertical: 16, borderRadius: 14, alignItems: 'center' },
-  btnDisabled:     { backgroundColor: 'rgba(174,183,132,0.22)' },
-  btnText:         { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629', letterSpacing: 0.6 },
+  btn: { backgroundColor: '#AEB784', paddingVertical: 16, borderRadius: 14, alignItems: 'center' },
+  btnDisabled: { backgroundColor: 'rgba(174,183,132,0.22)' },
+  btnText: { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629', letterSpacing: 0.6 },
   btnTextDisabled: { color: 'rgba(255,255,255,0.30)' },
 });
 
@@ -408,30 +402,30 @@ const modal = StyleSheet.create({
     backgroundColor: 'rgba(174,183,132,0.35)',
     alignSelf: 'center', marginTop: 12, marginBottom: 20,
   },
-  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
   headerTitle: { fontFamily: 'Fungis-Heavy', fontSize: 22, color: '#FFFFFF' },
-  closeBtn:    { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
-  closeX:      { fontFamily: 'Fungis-Bold', fontSize: 13, color: 'rgba(255,255,255,0.55)' },
-  accentBar:   { width: 36, height: 3, backgroundColor: '#AEB784', borderRadius: 2, marginBottom: 20 },
+  closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
+  closeX: { fontFamily: 'Fungis-Bold', fontSize: 13, color: 'rgba(255,255,255,0.55)' },
+  accentBar: { width: 36, height: 3, backgroundColor: '#AEB784', borderRadius: 2, marginBottom: 20 },
   scrollContent: { paddingBottom: 8 },
-  intro:         { fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.50)', lineHeight: 21, marginBottom: 24 },
-  section:       { marginBottom: 24 },
-  sectionHeading:{ fontFamily: 'Fungis-Bold', fontSize: 11, color: '#AEB784', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 },
-  bulletRow:     { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  bullet:        { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#AEB784', lineHeight: 22, marginTop: 1 },
-  para:          { flex: 1, fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 21 },
-  footerNote:    { paddingTop: 16, borderTopWidth: 1, borderColor: 'rgba(174,183,132,0.15)', marginTop: 4, marginBottom: 20 },
-  footerText:    { fontFamily: 'Fungis-Regular', fontSize: 11, color: 'rgba(255,255,255,0.25)', textAlign: 'center', letterSpacing: 0.5 },
-  agreeBtn:      { marginTop: 12, backgroundColor: '#AEB784', paddingVertical: 15, borderRadius: 14, alignItems: 'center' },
-  agreeBtnText:  { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629', letterSpacing: 0.6 },
+  intro: { fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.50)', lineHeight: 21, marginBottom: 24 },
+  section: { marginBottom: 24 },
+  sectionHeading: { fontFamily: 'Fungis-Bold', fontSize: 11, color: '#AEB784', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 },
+  bulletRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
+  bullet: { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#AEB784', lineHeight: 22, marginTop: 1 },
+  para: { flex: 1, fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 21 },
+  footerNote: { paddingTop: 16, borderTopWidth: 1, borderColor: 'rgba(174,183,132,0.15)', marginTop: 4, marginBottom: 20 },
+  footerText: { fontFamily: 'Fungis-Regular', fontSize: 11, color: 'rgba(255,255,255,0.25)', textAlign: 'center', letterSpacing: 0.5 },
+  agreeBtn: { marginTop: 12, backgroundColor: '#AEB784', paddingVertical: 15, borderRadius: 14, alignItems: 'center' },
+  agreeBtnText: { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629', letterSpacing: 0.6 },
 });
 
 const msgModal = StyleSheet.create({
-  bg:       { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 24 },
-  card:     { backgroundColor: '#2C3020', borderRadius: 24, padding: 28, width: '100%', maxWidth: 340, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.2)' },
-  icon:     { fontSize: 36, marginBottom: 12 },
-  title:    { fontFamily: 'Fungis-Heavy', fontSize: 22, color: '#FFFFFF', marginBottom: 8, textAlign: 'center' },
-  msg:      { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 28 },
-  btn:      { backgroundColor: '#AEB784', paddingVertical: 14, paddingHorizontal: 32, borderRadius: 100, width: '100%', alignItems: 'center' },
-  btnText:  { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629' },
+  bg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  card: { backgroundColor: '#2C3020', borderRadius: 24, padding: 28, width: '100%', maxWidth: 340, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.2)' },
+  icon: { fontSize: 36, marginBottom: 12 },
+  title: { fontFamily: 'Fungis-Heavy', fontSize: 22, color: '#FFFFFF', marginBottom: 8, textAlign: 'center' },
+  msg: { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 28 },
+  btn: { backgroundColor: '#AEB784', paddingVertical: 14, paddingHorizontal: 32, borderRadius: 100, width: '100%', alignItems: 'center' },
+  btnText: { fontFamily: 'Fungis-Bold', fontSize: 16, color: '#222629' },
 });

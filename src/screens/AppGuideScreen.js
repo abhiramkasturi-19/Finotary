@@ -10,7 +10,7 @@ import {
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const FREE_FEATURES = [
+const FEATURES = [
   {
     title: 'Home',
     desc: "Your monthly balance, income, and expenses at a glance. Tap + to add a transaction.",
@@ -24,28 +24,17 @@ const FREE_FEATURES = [
     desc: 'Calendar heat map of your spending — darker days mean more activity. Tap a day to see its transactions.',
   },
   {
+    title: 'Activity Search',
+    desc: 'Use the search icon in the Activity screen to find specific entries by note or amount.',
+  },
+  {
     title: 'Stats',
     desc: 'Dual line charts showing income vs expenses over time. Switch between weekly, monthly, and yearly views using the period selector.',
   },
   {
     title: 'Categories',
-    desc: 'Built-in categories cover common expenses. Add custom ones in the transaction form — each gets a unique color. Free users can add up to 3 custom categories.',
+    desc: 'Built-in categories cover common expenses. Add custom ones in the transaction form — each gets a unique color.',
   },
-  {
-    title: 'Backing Up & Restoring',
-    desc: 'Download a JSON backup of everything. On the Welcome screen tap Log In, then upload your backup JSON to fully restore your account.',
-  },
-  {
-    title: 'Privacy',
-    desc: 'All data stays on your device. Nothing is sent to any server. Your transactions and backup files never leave your phone unless you choose to share them.',
-  },
-  {
-    title: 'Demo Mode',
-    desc: 'Explore Finotary with 2 years of realistic sample data — no sign-up needed. Tap Try Demo in Settings → Data Management. The app enters read-only mode with a green banner at the top. Tap Exit Demo to return to your real data instantly. Nothing from the demo is ever saved.',
-  },
-];
-
-const PRO_FEATURES = [
   {
     title: 'Wallets',
     desc: 'Manage multiple spending contexts (e.g., Personal, Business). Transactions are tagged to the active wallet. Switch wallets via the avatar or wallet pill on the home screen.',
@@ -59,12 +48,16 @@ const PRO_FEATURES = [
     desc: 'Export transactions to CSV for Excel, or use Passcode Export to password-protect your backup files (creates an encrypted .enc file).',
   },
   {
-    title: 'Activity Search',
-    desc: 'Use the search icon in the Activity screen to find specific entries by note or amount.',
+    title: 'Backing Up & Restoring',
+    desc: 'Download a JSON backup of everything. On the Welcome screen tap Log In, then upload your backup JSON to fully restore your account.',
   },
   {
-    title: 'Unlimited Categories',
-    desc: 'Add as many custom categories as you need for both income and expenses.',
+    title: 'Privacy',
+    desc: 'All data stays on your device. Nothing is sent to any server. Your transactions and backup files never leave your phone unless you choose to share them.',
+  },
+  {
+    title: 'Demo Mode',
+    desc: 'Explore Finotary with 2 years of realistic sample data — no sign-up needed. Tap Try Demo in Settings → Data Management. The app enters read-only mode with a green banner at the top. Tap Exit Demo to return to your real data instantly. Nothing from the demo is ever saved.',
   },
 ];
 
@@ -114,28 +107,15 @@ export default function AppGuideScreen({ navigation }) {
           <View style={styles.titleAccent} />
 
           <Text style={styles.intro}>
-            A complete reference for Finotary Free and Pro features.
+            A complete reference for Finotary features.
           </Text>
 
-          <Text style={styles.sectionHeading}>Free Features</Text>
-          {FREE_FEATURES.map((section, i) => (
-            <View key={`free-${i}`} style={styles.card}>
+          <Text style={styles.sectionHeading}>App Features</Text>
+          {FEATURES.map((section, i) => (
+            <View key={`feature-${i}`} style={styles.card}>
               <View style={styles.cardHeader}>
                 <View style={styles.indexPill}>
                   <Text style={styles.indexText}>{String(i + 1).padStart(2, '0')}</Text>
-                </View>
-                <Text style={styles.cardTitle}>{section.title}</Text>
-              </View>
-              <Text style={styles.cardDesc}>{section.desc}</Text>
-            </View>
-          ))}
-
-          <Text style={[styles.sectionHeading, { marginTop: 24, color: '#AEB784' }]}>Pro Features</Text>
-          {PRO_FEATURES.map((section, i) => (
-            <View key={`pro-${i}`} style={[styles.card, { borderColor: 'rgba(174,183,132,0.3)' }]}>
-              <View style={styles.cardHeader}>
-                <View style={[styles.indexPill, { backgroundColor: '#AEB784', borderColor: '#AEB784' }]}>
-                  <Text style={[styles.indexText, { color: '#2C3020' }]}>{String(i + 1).padStart(2, '0')}</Text>
                 </View>
                 <Text style={styles.cardTitle}>{section.title}</Text>
               </View>

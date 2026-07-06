@@ -10,8 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
 import { lightColors, darkColors, spacing, radius, fonts } from '../theme/theme';
 
-const SCREEN_H    = Dimensions.get('window').height;
-const WALLET_ICONS = ['💳','💼','✈️','🏖️','🚗','🏠','🎓','💊','🛒','🎉','⚽','🍜','🎸','📱','🌍'];
+const SCREEN_H = Dimensions.get('window').height;
+const WALLET_ICONS = ['💳', '💼', '✈️', '🏖️', '🚗', '🏠', '🎓', '💊', '🛒', '🎉', '⚽', '🍜', '🎸', '📱', '🌍'];
 
 // ── Rename Modal ──────────────────────────────────────────────────────────────
 function RenameModal({ visible, wallet, onCancel, onSave, colors }) {
@@ -22,28 +22,28 @@ function RenameModal({ visible, wallet, onCancel, onSave, colors }) {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
           <View style={cm.sheet}>
-          <View style={cm.handle} />
-          <Text style={cm.title}>Rename Wallet</Text>
-          <TextInput
-            style={cm.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="Wallet name"
-            placeholderTextColor="rgba(255,255,255,0.30)"
-            autoFocus
-            maxLength={24}
-          />
-          <TouchableOpacity
-            style={[cm.primaryBtn, { opacity: name.trim() ? 1 : 0.4 }]}
-            onPress={() => name.trim() && onSave(name.trim())}
-            disabled={!name.trim()}
-          >
-            <Text style={cm.primaryBtnText}>Save</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={cm.ghostBtn} onPress={onCancel}>
-            <Text style={cm.ghostBtnText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={cm.handle} />
+            <Text style={cm.title}>Rename Wallet</Text>
+            <TextInput
+              style={cm.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Wallet name"
+              placeholderTextColor="rgba(255,255,255,0.30)"
+              autoFocus
+              maxLength={24}
+            />
+            <TouchableOpacity
+              style={[cm.primaryBtn, { opacity: name.trim() ? 1 : 0.4 }]}
+              onPress={() => name.trim() && onSave(name.trim())}
+              disabled={!name.trim()}
+            >
+              <Text style={cm.primaryBtnText}>Save</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={cm.ghostBtn} onPress={onCancel}>
+              <Text style={cm.ghostBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </Modal>
@@ -60,46 +60,46 @@ function NewWalletModal({ visible, onCancel, onCreate }) {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
           <View style={cm.sheet}>
-          <View style={cm.handle} />
-          <Text style={cm.title}>New Wallet</Text>
-          <Text style={cm.subtitle}>Give it a name and pick an icon</Text>
+            <View style={cm.handle} />
+            <Text style={cm.title}>New Wallet</Text>
+            <Text style={cm.subtitle}>Give it a name and pick an icon</Text>
 
-          <TextInput
-            style={cm.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="e.g. Kerala Trip, Work, Savings…"
-            placeholderTextColor="rgba(255,255,255,0.30)"
-            autoFocus
-            maxLength={24}
-          />
+            <TextInput
+              style={cm.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="e.g. Kerala Trip, Work, Savings…"
+              placeholderTextColor="rgba(255,255,255,0.30)"
+              autoFocus
+              maxLength={24}
+            />
 
-          <Text style={cm.iconPickerLabel}>ICON</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
-            <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 2, paddingVertical: 4 }}>
-              {WALLET_ICONS.map(ic => (
-                <TouchableOpacity
-                  key={ic}
-                  style={[cm.iconChip, ic === icon && cm.iconChipActive]}
-                  onPress={() => setIcon(ic)}
-                >
-                  <Text style={{ fontSize: 22 }}>{ic}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
+            <Text style={cm.iconPickerLabel}>ICON</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
+              <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 2, paddingVertical: 4 }}>
+                {WALLET_ICONS.map(ic => (
+                  <TouchableOpacity
+                    key={ic}
+                    style={[cm.iconChip, ic === icon && cm.iconChipActive]}
+                    onPress={() => setIcon(ic)}
+                  >
+                    <Text style={{ fontSize: 22 }}>{ic}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
 
-          <TouchableOpacity
-            style={[cm.primaryBtn, { opacity: name.trim() ? 1 : 0.4 }]}
-            onPress={() => name.trim() && onCreate(name.trim(), icon)}
-            disabled={!name.trim()}
-          >
-            <Text style={cm.primaryBtnText}>Create Wallet</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={cm.ghostBtn} onPress={onCancel}>
-            <Text style={cm.ghostBtnText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={[cm.primaryBtn, { opacity: name.trim() ? 1 : 0.4 }]}
+              onPress={() => name.trim() && onCreate(name.trim(), icon)}
+              disabled={!name.trim()}
+            >
+              <Text style={cm.primaryBtnText}>Create Wallet</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={cm.ghostBtn} onPress={onCancel}>
+              <Text style={cm.ghostBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </Modal>
@@ -116,10 +116,10 @@ export default function WalletsScreen({ navigation }) {
   const colors = settings.darkMode ? darkColors : lightColors;
   const s = makeStyles(colors);
 
-  const [newModalOpen,    setNewModalOpen   ] = useState(false);
-  const [renameTarget,    setRenameTarget   ] = useState(null);
-  const [showArchived,    setShowArchived   ] = useState(false);
-  const [walletToDelete,  setWalletToDelete ] = useState(null);
+  const [newModalOpen, setNewModalOpen] = useState(false);
+  const [renameTarget, setRenameTarget] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [walletToDelete, setWalletToDelete] = useState(null);
 
   const slideAnim = useRef(new Animated.Value(SCREEN_H)).current;
 
@@ -145,8 +145,8 @@ export default function WalletsScreen({ navigation }) {
   };
 
 
-  const active   = (wallets || []).filter(w => !w.archived);
-  const archived = (wallets || []).filter(w =>  w.archived);
+  const active = (wallets || []).filter(w => !w.archived);
+  const archived = (wallets || []).filter(w => w.archived);
 
   const txnCount = (walletId) =>
     transactions.filter(t => (t.walletId || 'default') === walletId).length;
@@ -219,8 +219,8 @@ export default function WalletsScreen({ navigation }) {
           <View style={s.card}>
             {active.map((wallet, i) => {
               const isActive = wallet.id === activeWalletId;
-              const count    = txnCount(wallet.id);
-              const isLast   = i === active.length - 1;
+              const count = txnCount(wallet.id);
+              const isLast = i === active.length - 1;
               return (
                 <TouchableOpacity
                   key={wallet.id}
@@ -283,7 +283,7 @@ export default function WalletsScreen({ navigation }) {
               {showArchived && (
                 <View style={s.card}>
                   {archived.map((wallet, i) => {
-                    const count  = txnCount(wallet.id);
+                    const count = txnCount(wallet.id);
                     const isLast = i === archived.length - 1;
                     return (
                       <View key={wallet.id} style={[s.walletRow, isLast && { borderBottomWidth: 0 }]}>
@@ -310,12 +310,9 @@ export default function WalletsScreen({ navigation }) {
             </>
           )}
 
-<Text style={s.footnote}>
-  Long-press any wallet row to rename it.
-</Text>
-<Text style={s.footnote}>
-  Archived wallets keep their transactions but are hidden from the active view.
-</Text>
+          <Text style={s.footnote}>
+            Archived wallets keep their transactions but are hidden from the active view.
+          </Text>
 
         </ScrollView>
       </Animated.View>
@@ -362,77 +359,77 @@ export default function WalletsScreen({ navigation }) {
 }
 
 const makeStyles = (colors) => StyleSheet.create({
-  safe:    { flex: 1, backgroundColor: colors.bg, paddingTop: -50, paddingBottom: -100 },
+  safe: { flex: 1, backgroundColor: colors.bg, paddingTop: -50, paddingBottom: -100 },
   content: { padding: spacing.md, paddingTop: 50, paddingBottom: 120 },
 
-  header:   { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: spacing.lg },
-  backBtn:  { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: spacing.lg },
+  backBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   backText: { fontFamily: fonts.bold, fontSize: 18, color: colors.textPrimary },
-  title:    { fontFamily: fonts.heavy,   fontSize: 26, color: colors.textPrimary },
+  title: { fontFamily: fonts.heavy, fontSize: 26, color: colors.textPrimary },
   subtitle: { fontFamily: fonts.regular, fontSize: 13, color: colors.textMuted, marginTop: 2 },
 
-  activeBanner:     { backgroundColor: colors.accentDark + '22', borderWidth: 1, borderColor: colors.accentDark + '55', borderRadius: 12, padding: 14, marginBottom: spacing.lg },
+  activeBanner: { backgroundColor: colors.accentDark + '22', borderWidth: 1, borderColor: colors.accentDark + '55', borderRadius: 12, padding: 14, marginBottom: spacing.lg },
   activeBannerText: { fontFamily: fonts.regular, fontSize: 13, color: colors.textPrimary, lineHeight: 20 },
   activeBannerName: { fontFamily: fonts.bold, color: colors.accent },
   activeBannerBack: { fontFamily: fonts.bold, fontSize: 12, color: colors.accent, marginTop: 8 },
 
   sectionLabel: { fontFamily: fonts.bold, fontSize: 11, color: colors.textMuted, letterSpacing: 1, marginBottom: 10 },
-  card:         { backgroundColor: colors.surface, borderRadius: radius.lg, marginBottom: spacing.lg, overflow: 'hidden' },
+  card: { backgroundColor: colors.surface, borderRadius: radius.lg, marginBottom: spacing.lg, overflow: 'hidden' },
 
-  walletRow:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 12 },
+  walletRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 12 },
   walletRowActive: { backgroundColor: colors.accent + '18' },
-  walletIconBox:       { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center' },
+  walletIconBox: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center' },
   walletIconBoxActive: { backgroundColor: colors.accent + '33' },
-  walletIcon:   { fontSize: 22 },
-  walletInfo:   { flex: 1 },
-  walletName:   { fontFamily: fonts.bold, fontSize: 15, color: colors.textPrimary },
+  walletIcon: { fontSize: 22 },
+  walletInfo: { flex: 1 },
+  walletName: { fontFamily: fonts.bold, fontSize: 15, color: colors.textPrimary },
   walletNameActive: { color: colors.accentDark },
-  walletCount:  { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, marginTop: 2 },
+  walletCount: { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, marginTop: 2 },
 
-  activePill:     { backgroundColor: colors.accent, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
+  activePill: { backgroundColor: colors.accent, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
   activePillText: { fontFamily: fonts.bold, fontSize: 10, color: colors.activePill ?? '#fff' },
 
-  walletActions:  { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  actionBtn:      { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  actionBtnText:  { fontSize: 16 },
-  rowChevron:     { fontFamily: fonts.bold, fontSize: 16, color: colors.textMuted, marginLeft: 4 },
+  walletActions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  actionBtn: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  actionBtnText: { fontSize: 16 },
+  rowChevron: { fontFamily: fonts.bold, fontSize: 16, color: colors.textMuted, marginLeft: 4 },
 
-  newBtn:     { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: colors.surface, borderRadius: radius.lg, padding: 16, borderWidth: 1.5, borderColor: colors.accent, borderStyle: 'dashed', marginBottom: spacing.lg },
+  newBtn: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: colors.surface, borderRadius: radius.lg, padding: 16, borderWidth: 1.5, borderColor: colors.accent, borderStyle: 'dashed', marginBottom: spacing.lg },
   newBtnIcon: { fontFamily: fonts.heavy, fontSize: 22, color: colors.accent, width: 30, textAlign: 'center' },
   newBtnText: { fontFamily: fonts.bold, fontSize: 15, color: colors.accent },
   newBtnHint: { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, marginTop: 2 },
 
   archivedHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  chevron:        { fontFamily: fonts.bold, fontSize: 10, color: colors.textMuted },
+  chevron: { fontFamily: fonts.bold, fontSize: 10, color: colors.textMuted },
 
   footnote: { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, textAlign: 'center', lineHeight: 18, marginTop: 4 },
 });
 
 const cm = StyleSheet.create({
-  backdrop:  { flex: 1, backgroundColor: 'rgba(0,0,0,0.78)', justifyContent: 'flex-end' },
-  sheet:     { backgroundColor: '#2C3020', borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 24, paddingBottom: 32, borderWidth: 1, borderColor: 'rgba(174,183,132,0.18)', borderBottomWidth: 0 },
-  handle:    { width: 38, height: 4, borderRadius: 2, backgroundColor: 'rgba(174,183,132,0.35)', alignSelf: 'center', marginTop: 12, marginBottom: 24 },
-  title:     { fontFamily: 'Fungis-Heavy', fontSize: 20, color: '#FFFFFF', marginBottom: 6 },
-  subtitle:  { fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 20 },
-  input:     { backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 13, fontFamily: 'Fungis-Bold', fontSize: 15, color: '#FFFFFF', marginBottom: 18, borderWidth: 1, borderColor: 'rgba(174,183,132,0.20)' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.78)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#2C3020', borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 24, paddingBottom: 32, borderWidth: 1, borderColor: 'rgba(174,183,132,0.18)', borderBottomWidth: 0 },
+  handle: { width: 38, height: 4, borderRadius: 2, backgroundColor: 'rgba(174,183,132,0.35)', alignSelf: 'center', marginTop: 12, marginBottom: 24 },
+  title: { fontFamily: 'Fungis-Heavy', fontSize: 20, color: '#FFFFFF', marginBottom: 6 },
+  subtitle: { fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 20 },
+  input: { backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 13, fontFamily: 'Fungis-Bold', fontSize: 15, color: '#FFFFFF', marginBottom: 18, borderWidth: 1, borderColor: 'rgba(174,183,132,0.20)' },
   iconPickerLabel: { fontFamily: 'Fungis-Bold', fontSize: 10, color: 'rgba(255,255,255,0.40)', letterSpacing: 1, marginBottom: 10 },
-  iconChip:       { width: 46, height: 46, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.12)' },
+  iconChip: { width: 46, height: 46, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.12)' },
   iconChipActive: { backgroundColor: 'rgba(174,183,132,0.20)', borderColor: 'rgba(174,183,132,0.60)' },
-  primaryBtn:     { backgroundColor: '#AEB784', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginBottom: 12 },
+  primaryBtn: { backgroundColor: '#AEB784', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginBottom: 12 },
   primaryBtnText: { fontFamily: 'Fungis-Bold', fontSize: 15, color: '#222629' },
-  ghostBtn:       { borderRadius: 14, paddingVertical: 14, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)' },
-  ghostBtnText:   { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.40)' },
+  ghostBtn: { borderRadius: 14, paddingVertical: 14, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)' },
+  ghostBtnText: { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.40)' },
 });
 
 const msgModal = StyleSheet.create({
-  bg:       { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 24 },
-  card:     { backgroundColor: '#2C3020', borderRadius: 24, padding: 28, width: '100%', maxWidth: 340, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.2)' },
-  icon:     { fontSize: 36, marginBottom: 12 },
-  title:    { fontFamily: 'Fungis-Heavy', fontSize: 22, color: '#FFFFFF', marginBottom: 8, textAlign: 'center' },
-  msg:      { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 28 },
-  btnRow:   { flexDirection: 'row', gap: 12, width: '100%' },
-  btn:      { flex: 1, paddingVertical: 14, borderRadius: 100, alignItems: 'center' },
-  btnText:  { fontFamily: 'Fungis-Bold', fontSize: 16 },
+  bg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  card: { backgroundColor: '#2C3020', borderRadius: 24, padding: 28, width: '100%', maxWidth: 340, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(174,183,132,0.2)' },
+  icon: { fontSize: 36, marginBottom: 12 },
+  title: { fontFamily: 'Fungis-Heavy', fontSize: 22, color: '#FFFFFF', marginBottom: 8, textAlign: 'center' },
+  msg: { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 28 },
+  btnRow: { flexDirection: 'row', gap: 12, width: '100%' },
+  btn: { flex: 1, paddingVertical: 14, borderRadius: 100, alignItems: 'center' },
+  btnText: { fontFamily: 'Fungis-Bold', fontSize: 16 },
   cancelBtn: { backgroundColor: 'transparent', borderWidth: 1, borderColor: 'rgba(174,183,132,0.3)' },
   cancelBtnText: { color: 'rgba(255,255,255,0.8)' },
   destructiveBtn: { backgroundColor: '#B07070' },
