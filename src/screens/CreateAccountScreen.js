@@ -1,7 +1,7 @@
 // src/screens/CreateAccountScreen.js
 // Finotary v1.0.1 — Onboarding Page 2 — custom crop modal
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, ImageBackground, TouchableOpacity,
   TextInput, ScrollView, Dimensions, StatusBar,
@@ -10,7 +10,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useApp } from '../context/AppContext';
+import { useApp, calculateAge } from '../context/AppContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -154,14 +154,28 @@ export default function CreateAccountScreen({ navigation }) {
 
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState('');
-  const [age, setAge] = useState('');
+  const [dobDay, setDobDay] = useState('');
+  const [dobMonth, setDobMonth] = useState('');
+  const [dobYear, setDobYear] = useState('');
+  const dobDayRef = useRef(null);
+  const dobMonthRef = useRef(null);
+  const dobYearRef = useRef(null);
   const [selectedTheme, setSelectedTheme] = useState('dark');
   const [selectedCurrency, setSelectedCurrency] = useState('INR');
   const [agreed, setAgreed] = useState(false);
   const [termsVisible, setTermsVisible] = useState(false);
   const [msgData, setMsgData] = useState(null); // {title, message}
 
-  const canProceed = username.trim().length > 0 && age.trim().length > 0 && agreed;
+  const isDobValid = () => {
+    const d = parseInt(dobDay, 10), m = parseInt(dobMonth, 10), y = parseInt(dobYear, 10);
+    if (!d || !m || !y || dobYear.length !== 4) return false;
+    if (d < 1 || d > 31 || m < 1 || m > 12) return false;
+    if (y < 1900 || y > new Date().getFullYear()) return false;
+    const date = new Date(y, m - 1, d);
+    return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+  };
+
+  const canProceed = username.trim().length > 0 && isDobValid() && agreed;
 
   const pickProfileImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -181,9 +195,12 @@ export default function CreateAccountScreen({ navigation }) {
   };
 
   const handleContinue = () => {
+    const pad = (n) => String(n).padStart(2, '0');
+    const dob = `${dobYear}-${pad(dobMonth)}-${pad(dobDay)}`;
     updateSettings({
       name: username.trim(),
-      age: age.trim(),
+      dob,
+      age: calculateAge(dob),
       darkMode: selectedTheme === 'dark',
       currency: CURRENCY_SYMBOLS[selectedCurrency],
       profileImage: profileImage || '',
@@ -238,13 +255,52 @@ export default function CreateAccountScreen({ navigation }) {
                 autoCapitalize="words" maxLength={24} returnKeyType="next"
               />
 
-              {/* ── Age ── */}
-              <Text style={styles.label}>Age</Text>
-              <TextInput
-                style={styles.input} value={age} onChangeText={v => setAge(v.replace(/[^0-9]/g, ''))}
-                placeholder="Your age" placeholderTextColor="rgba(255,255,255,0.30)"
-                keyboardType="number-pad" maxLength={3} returnKeyType="done"
-              />
+              {/* ── Date of Birth ── */}
+              <Text style={styles.label}>Date of Birth</Text>
+              <Text style={styles.dobHint}>Used to recover your App Lock PIN if you ever forget it.</Text>
+              <View style={styles.dobRow}>
+                <TextInput
+                  ref={dobDayRef}
+                  style={[styles.input, styles.dobInput]} value={dobDay}
+                  onChangeText={v => {
+                    const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                    setDobDay(clean);
+                    if (clean.length === 2) dobMonthRef.current?.focus();
+                  }}
+                  placeholder="DD" placeholderTextColor="rgba(255,255,255,0.30)"
+                  keyboardType="number-pad" maxLength={2} textAlign="center"
+                />
+                <TextInput
+                  ref={dobMonthRef}
+                  style={[styles.input, styles.dobInput]} value={dobMonth}
+                  onChangeText={v => {
+                    const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                    setDobMonth(clean);
+                    if (clean.length === 2) dobYearRef.current?.focus();
+                  }}
+                  onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === 'Backspace' && dobMonth === '') {
+                      setDobDay(d => d.slice(0, -1));
+                      dobDayRef.current?.focus();
+                    }
+                  }}
+                  placeholder="MM" placeholderTextColor="rgba(255,255,255,0.30)"
+                  keyboardType="number-pad" maxLength={2} textAlign="center"
+                />
+                <TextInput
+                  ref={dobYearRef}
+                  style={[styles.input, styles.dobInputYear]} value={dobYear}
+                  onChangeText={v => setDobYear(v.replace(/[^0-9]/g, '').slice(0, 4))}
+                  onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === 'Backspace' && dobYear === '') {
+                      setDobMonth(m => m.slice(0, -1));
+                      dobMonthRef.current?.focus();
+                    }
+                  }}
+                  placeholder="YYYY" placeholderTextColor="rgba(255,255,255,0.30)"
+                  keyboardType="number-pad" maxLength={4} returnKeyType="done" textAlign="center"
+                />
+              </View>
 
               {/* ── Theme ── */}
               <Text style={styles.label}>Theme</Text>
@@ -364,6 +420,11 @@ const styles = StyleSheet.create({
     borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
     fontFamily: 'Fungis-Regular', fontSize: 16, color: '#FFFFFF', marginBottom: 26,
   },
+
+  dobHint: { fontFamily: 'Fungis-Regular', fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: -4, marginBottom: 12, lineHeight: 16 },
+  dobRow: { flexDirection: 'row', gap: 10 },
+  dobInput: { flex: 1 },
+  dobInputYear: { flex: 1.5 },
 
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 26 },
   chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 100, borderWidth: 1, borderColor: 'rgba(174,183,132,0.35)', backgroundColor: 'rgba(255,255,255,0.04)' },

@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   TouchableOpacity, View, StyleSheet, Text, Modal,
   Animated, Dimensions, BackHandler, AppState,
+  TextInput, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
@@ -78,18 +79,38 @@ const demoBanner = StyleSheet.create({
 // Sits inside AppProvider so it can read settings.
 // Watches AppState — shows PIN pad whenever app comes back to foreground with lock enabled.
 function AppLockOverlay({ children }) {
-  const { settings, isDemoMode } = useApp();
+  const { settings, isDemoMode, updateSettings } = useApp();
   const [locked, setLocked] = useState(false);
   const [pin,    setPin  ]  = useState('');
   const [shake,  setShake]  = useState(false);
   const shakeAnim           = useRef(new Animated.Value(0)).current;
   const appStateRef         = useRef(AppState.currentState);
 
+  // ── Forgot PIN → verify Date of Birth → set a new PIN ────────────────────
+  const [mode,        setMode       ] = useState('pin'); // 'pin' | 'forgot' | 'reset'
+  const [fDay,         setFDay      ] = useState('');
+  const [fMonth,       setFMonth    ] = useState('');
+  const [fYear,        setFYear     ] = useState('');
+  const [fError,       setFError    ] = useState('');
+  const fDayRef   = useRef(null);
+  const fMonthRef = useRef(null);
+  const fYearRef  = useRef(null);
+  const [newPin1,      setNewPin1   ] = useState('');
+  const [newPin2,      setNewPin2   ] = useState('');
+  const [newPinStep,   setNewPinStep] = useState(1);
+  const [newPinError,  setNewPinError] = useState('');
+
+  const resetForgotState = () => {
+    setMode('pin'); setFDay(''); setFMonth(''); setFYear(''); setFError('');
+    setNewPin1(''); setNewPin2(''); setNewPinStep(1); setNewPinError('');
+  };
+
   useEffect(() => {
     if (isDemoMode) { setLocked(false); return; }
     if (settings.appLockEnabled && settings.appLockPin) {
       setLocked(true);
       setPin('');
+      resetForgotState();
     }
     const sub = AppState.addEventListener('change', (next) => {
       const prev = appStateRef.current;
@@ -98,11 +119,37 @@ function AppLockOverlay({ children }) {
         if (!isDemoMode && settings.appLockEnabled && settings.appLockPin) {
           setLocked(true);
           setPin('');
+          resetForgotState();
         }
       }
     });
     return () => sub.remove();
   }, [settings.appLockEnabled, settings.appLockPin, isDemoMode]);
+
+  const handleVerifyDob = () => {
+    const d = parseInt(fDay, 10), m = parseInt(fMonth, 10), y = parseInt(fYear, 10);
+    if (!d || !m || !y || fYear.length !== 4) { setFError('Enter your full date of birth'); return; }
+    const pad = (n) => String(n).padStart(2, '0');
+    const entered = `${y}-${pad(m)}-${pad(d)}`;
+    if (settings.dob && entered === settings.dob) {
+      setFError('');
+      setMode('reset');
+    } else {
+      setFError('Date of birth does not match');
+    }
+  };
+
+  const handleSetNewPin = () => {
+    if (newPinStep === 1) {
+      if (newPin1.length !== 4) { setNewPinError('PIN must be 4 digits'); return; }
+      setNewPinStep(2); setNewPin2(''); setNewPinError('');
+      return;
+    }
+    if (newPin2 !== newPin1) { setNewPinError('PINs do not match'); setNewPin2(''); return; }
+    updateSettings({ appLockPin: newPin1 });
+    setLocked(false);
+    resetForgotState();
+  };
 
   const triggerShake = () => {
     setPin('');
@@ -141,35 +188,138 @@ function AppLockOverlay({ children }) {
         {children}
       </View>
       <Modal visible={locked} animationType="fade" transparent={false} statusBarTranslucent>
-        <View style={lock.root}>
-          <Text style={lock.appName}>Finotary</Text>
-          <Text style={lock.label}>Enter your PIN</Text>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <View style={lock.root}>
+            <Text style={lock.appName}>Finotary</Text>
 
-          {/* Dots */}
-          <Animated.View style={[lock.dotsRow, { transform: [{ translateX: shakeAnim }] }]}>
-            {[0,1,2,3].map(i => (
-              <View key={i} style={[lock.dot, pin.length > i && lock.dotFilled]} />
-            ))}
-          </Animated.View>
+            {mode === 'pin' && (
+              <>
+                <Text style={lock.label}>Enter your PIN</Text>
 
-          {/* Numpad */}
-          <View style={lock.pad}>
-            {DIGITS.map((d, i) => {
-              if (d === '') return <View key={i} style={lock.padEmpty} />;
-              const isBack = d === '⌫';
-              return (
-                <TouchableOpacity
-                  key={i}
-                  style={lock.padBtn}
-                  onPress={() => isBack ? handleBackspace() : handleDigit(d)}
-                  activeOpacity={0.65}
-                >
-                  <Text style={[lock.padText, isBack && lock.padBack]}>{d}</Text>
+                {/* Dots */}
+                <Animated.View style={[lock.dotsRow, { transform: [{ translateX: shakeAnim }] }]}>
+                  {[0,1,2,3].map(i => (
+                    <View key={i} style={[lock.dot, pin.length > i && lock.dotFilled]} />
+                  ))}
+                </Animated.View>
+
+                {/* Numpad */}
+                <View style={lock.pad}>
+                  {DIGITS.map((d, i) => {
+                    if (d === '') return <View key={i} style={lock.padEmpty} />;
+                    const isBack = d === '⌫';
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        style={lock.padBtn}
+                        onPress={() => isBack ? handleBackspace() : handleDigit(d)}
+                        activeOpacity={0.65}
+                      >
+                        <Text style={[lock.padText, isBack && lock.padBack]}>{d}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {!!settings.dob && (
+                  <TouchableOpacity
+                    style={lock.forgotBtn}
+                    onPress={() => { resetForgotState(); setMode('forgot'); }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={lock.forgotText}>Forgot PIN?</Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+
+            {mode === 'forgot' && (
+              <>
+                <Text style={lock.label}>Verify your Date of Birth</Text>
+                <Text style={lock.sublabel}>Enter the date of birth on your profile to reset your PIN.</Text>
+
+                <View style={lock.dobRow}>
+                  <TextInput
+                    ref={fDayRef}
+                    style={lock.dobInput} value={fDay}
+                    onChangeText={v => {
+                      const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                      setFDay(clean);
+                      if (clean.length === 2) fMonthRef.current?.focus();
+                    }}
+                    placeholder="DD" placeholderTextColor="rgba(255,255,255,0.30)"
+                    keyboardType="number-pad" maxLength={2} textAlign="center"
+                  />
+                  <TextInput
+                    ref={fMonthRef}
+                    style={lock.dobInput} value={fMonth}
+                    onChangeText={v => {
+                      const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                      setFMonth(clean);
+                      if (clean.length === 2) fYearRef.current?.focus();
+                    }}
+                    onKeyPress={({ nativeEvent }) => {
+                      if (nativeEvent.key === 'Backspace' && fMonth === '') {
+                        setFDay(d => d.slice(0, -1));
+                        fDayRef.current?.focus();
+                      }
+                    }}
+                    placeholder="MM" placeholderTextColor="rgba(255,255,255,0.30)"
+                    keyboardType="number-pad" maxLength={2} textAlign="center"
+                  />
+                  <TextInput
+                    ref={fYearRef}
+                    style={[lock.dobInput, lock.dobInputYear]} value={fYear}
+                    onChangeText={v => setFYear(v.replace(/[^0-9]/g, '').slice(0, 4))}
+                    onKeyPress={({ nativeEvent }) => {
+                      if (nativeEvent.key === 'Backspace' && fYear === '') {
+                        setFMonth(m => m.slice(0, -1));
+                        fMonthRef.current?.focus();
+                      }
+                    }}
+                    placeholder="YYYY" placeholderTextColor="rgba(255,255,255,0.30)"
+                    keyboardType="number-pad" maxLength={4} textAlign="center"
+                  />
+                </View>
+
+                {!!fError && <Text style={lock.errorText}>{fError}</Text>}
+
+                <TouchableOpacity style={lock.primaryBtn} onPress={handleVerifyDob} activeOpacity={0.85}>
+                  <Text style={lock.primaryBtnText}>Verify</Text>
                 </TouchableOpacity>
-              );
-            })}
+                <TouchableOpacity style={lock.ghostBtn} onPress={resetForgotState} activeOpacity={0.7}>
+                  <Text style={lock.ghostText}>Back to PIN</Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            {mode === 'reset' && (
+              <>
+                <Text style={lock.label}>{newPinStep === 1 ? 'Set a new PIN' : 'Confirm new PIN'}</Text>
+                <Text style={lock.sublabel}>
+                  {newPinStep === 1 ? 'Enter a new 4-digit PIN.' : 'Re-enter your new PIN to confirm.'}
+                </Text>
+
+                <TextInput
+                  style={lock.newPinInput}
+                  value={newPinStep === 1 ? newPin1 : newPin2}
+                  onChangeText={v => (newPinStep === 1 ? setNewPin1 : setNewPin2)(v.replace(/[^0-9]/g, '').slice(0, 4))}
+                  placeholder="····" placeholderTextColor="rgba(255,255,255,0.2)"
+                  keyboardType="number-pad" maxLength={4} secureTextEntry autoFocus
+                  textAlign="center"
+                />
+                {!!newPinError && <Text style={lock.errorText}>{newPinError}</Text>}
+
+                <TouchableOpacity style={lock.primaryBtn} onPress={handleSetNewPin} activeOpacity={0.85}>
+                  <Text style={lock.primaryBtnText}>{newPinStep === 1 ? 'Next' : 'Save PIN'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={lock.ghostBtn} onPress={resetForgotState} activeOpacity={0.7}>
+                  <Text style={lock.ghostText}>Cancel</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -187,6 +337,31 @@ const lock = StyleSheet.create({
   padBtn:    { width: 72, height: 72, borderRadius: 36, backgroundColor: 'rgba(174,183,132,0.10)', borderWidth: 1, borderColor: 'rgba(174,183,132,0.18)', alignItems: 'center', justifyContent: 'center' },
   padText:   { fontFamily: 'Fungis-Heavy', fontSize: 26, color: '#FFFFFF' },
   padBack:   { fontSize: 22, color: 'rgba(255,255,255,0.55)' },
+
+  forgotBtn:  { marginTop: 30, paddingVertical: 8, paddingHorizontal: 16 },
+  forgotText: { fontFamily: 'Fungis-Bold', fontSize: 13, color: '#AEB784' },
+
+  sublabel:  { fontFamily: 'Fungis-Regular', fontSize: 12, color: 'rgba(255,255,255,0.40)', textAlign: 'center', lineHeight: 18, marginBottom: 28, paddingHorizontal: 30 },
+
+  dobRow:       { flexDirection: 'row', gap: 10, width: 260, marginBottom: 8 },
+  dobInput:     {
+    flex: 1, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: 'rgba(174,183,132,0.28)',
+    borderRadius: 12, paddingVertical: 14, fontFamily: 'Fungis-Bold', fontSize: 16, color: '#FFFFFF',
+  },
+  dobInputYear: { flex: 1.5 },
+
+  errorText: { fontFamily: 'Fungis-Regular', fontSize: 12, color: '#D4918F', textAlign: 'center', marginTop: 10, width: 260 },
+
+  primaryBtn:     { width: 260, backgroundColor: '#AEB784', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24 },
+  primaryBtnText: { fontFamily: 'Fungis-Bold', fontSize: 15, color: '#222629' },
+  ghostBtn:       { marginTop: 14, paddingVertical: 8 },
+  ghostText:      { fontFamily: 'Fungis-Regular', fontSize: 13, color: 'rgba(255,255,255,0.4)' },
+
+  newPinInput: {
+    width: 200, backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 12, paddingVertical: 16,
+    fontFamily: 'Fungis-Bold', fontSize: 22, color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(174,183,132,0.28)',
+    letterSpacing: 8,
+  },
 });
 
 // ─── Custom Tab Bar ───────────────────────────────────────────────────────────

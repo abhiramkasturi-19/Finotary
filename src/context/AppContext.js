@@ -25,11 +25,25 @@ const getUniqueColor = (existingCustom) => {
 
 export const DEFAULT_WALLET = { id: 'default', name: 'Personal', icon: '💳', archived: false };
 
+// Computes current age (years) from a 'YYYY-MM-DD' date-of-birth string.
+// Returns '' if dob is missing/invalid.
+export function calculateAge(dob) {
+  if (!dob) return '';
+  const birth = new Date(dob);
+  if (isNaN(birth.getTime())) return '';
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age >= 0 ? String(age) : '';
+}
+
 const initialState = {
   transactions: [],
   settings: {
     name:           '',
     age:            '',
+    dob:            '', // 'YYYY-MM-DD' — used as the Forgot PIN recovery hint
     currency:       '₹',
     darkMode:       false,
     profileImage:   '',

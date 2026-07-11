@@ -1,7 +1,7 @@
 // src/screens/SettingsScreen.js
 // Finotary v1.0.1 — Pro badge · App Lock · CSV Export · Passcode Export · Wallets · Upgrade row
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
   StyleSheet, Switch, Image, ImageBackground, Dimensions, Modal, Platform,
@@ -14,7 +14,7 @@ import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
-import { useApp, DEFAULT_WALLET } from '../context/AppContext';
+import { useApp, DEFAULT_WALLET, calculateAge } from '../context/AppContext';
 import { getCat } from '../data/categories';
 import { lightColors, darkColors, spacing, radius, fonts } from '../theme/theme';
 
@@ -159,7 +159,7 @@ function CameraIcon({ color }) {
 }
 
 // ─── PIN Setup Modal ──────────────────────────────────────────────────────────
-function PinSetupModal({ visible, onCancel, onSave }) {
+function PinSetupModal({ visible, onCancel, onSave, confirmLabel = 'Enable Lock' }) {
   const [step, setStep] = useState(1);
   const [pin1, setPin1] = useState('');
   const [pin2, setPin2] = useState('');
@@ -188,9 +188,119 @@ function PinSetupModal({ visible, onCancel, onSave }) {
             <TextInput style={[cm.pinInput, { marginBottom: 20 }]} value={step === 1 ? pin1 : pin2} onChangeText={step === 1 ? setPin1 : setPin2} keyboardType="number-pad" maxLength={4} secureTextEntry placeholder="····" placeholderTextColor="rgba(255,255,255,0.2)" autoFocus />
             {!!error && <Text style={cm.errorText}>{error}</Text>}
             <TouchableOpacity style={[cm.primaryBtn, { opacity: (step === 1 ? pin1 : pin2).length === 4 ? 1 : 0.5 }]} onPress={step === 1 ? handleNext : handleConfirm} disabled={(step === 1 ? pin1 : pin2).length !== 4}>
-              <Text style={cm.primaryBtnText}>{step === 1 ? 'Next' : 'Enable Lock'}</Text>
+              <Text style={cm.primaryBtnText}>{step === 1 ? 'Next' : confirmLabel}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={cm.ghostBtn} onPress={() => { reset(); onCancel(); }}><Text style={cm.ghostBtnText}>Cancel</Text></TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+// ─── PIN Verify Modal (current PIN, with Date-of-Birth fallback) ──────────────
+// Used to authorize disabling App Lock or changing the PIN.
+function PinVerifyModal({ visible, currentPin, dob, onCancel, onVerified }) {
+  const [mode,  setMode ] = useState('pin'); // 'pin' | 'dob'
+  const [pin,   setPin  ] = useState('');
+  const [day,   setDay  ] = useState('');
+  const [month, setMonth] = useState('');
+  const [year,  setYear ] = useState('');
+  const [error, setError] = useState('');
+  const dayRef   = useRef(null);
+  const monthRef = useRef(null);
+  const yearRef  = useRef(null);
+
+  const reset = () => { setMode('pin'); setPin(''); setDay(''); setMonth(''); setYear(''); setError(''); };
+  const close = () => { reset(); onCancel(); };
+
+  const handleVerify = () => {
+    if (mode === 'pin') {
+      if (pin !== currentPin) { setError('Incorrect PIN'); setPin(''); return; }
+    } else {
+      const d = parseInt(day, 10), m = parseInt(month, 10), y = parseInt(year, 10);
+      if (!d || !m || !y || year.length !== 4) { setError('Enter your full date of birth'); return; }
+      const pad = n => String(n).padStart(2, '0');
+      const entered = `${y}-${pad(m)}-${pad(d)}`;
+      if (!dob || entered !== dob) { setError('Date of birth does not match'); return; }
+    }
+    reset();
+    onVerified();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={close}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableOpacity style={cm.backdrop} activeOpacity={1} onPress={Keyboard.dismiss}>
+          <View style={[cm.sheet, { marginBottom: 40 }]}>
+            <View style={cm.handle} />
+            <View style={cm.iconRing}><Text style={cm.iconEmoji}>🔒</Text></View>
+            <Text style={cm.title}>{mode === 'pin' ? 'Verify PIN' : 'Verify Date of Birth'}</Text>
+            <Text style={cm.body}>
+              {mode === 'pin' ? 'Enter your current PIN to continue.' : 'Enter the date of birth on your profile.'}
+            </Text>
+
+            {mode === 'pin' ? (
+              <TextInput
+                style={cm.pinInput} value={pin} onChangeText={v => setPin(v.replace(/[^0-9]/g, '').slice(0, 4))}
+                keyboardType="number-pad" maxLength={4} secureTextEntry
+                placeholder="····" placeholderTextColor="rgba(255,255,255,0.2)" autoFocus
+              />
+            ) : (
+              <View style={cm.dobRow}>
+                <TextInput
+                  ref={dayRef}
+                  style={[cm.pinInput, cm.dobInput]} value={day}
+                  onChangeText={v => {
+                    const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                    setDay(clean);
+                    if (clean.length === 2) monthRef.current?.focus();
+                  }}
+                  placeholder="DD" placeholderTextColor="rgba(255,255,255,0.2)" keyboardType="number-pad" maxLength={2}
+                />
+                <TextInput
+                  ref={monthRef}
+                  style={[cm.pinInput, cm.dobInput]} value={month}
+                  onChangeText={v => {
+                    const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                    setMonth(clean);
+                    if (clean.length === 2) yearRef.current?.focus();
+                  }}
+                  onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === 'Backspace' && month === '') {
+                      setDay(d => d.slice(0, -1));
+                      dayRef.current?.focus();
+                    }
+                  }}
+                  placeholder="MM" placeholderTextColor="rgba(255,255,255,0.2)" keyboardType="number-pad" maxLength={2}
+                />
+                <TextInput
+                  ref={yearRef}
+                  style={[cm.pinInput, cm.dobInputYear]} value={year}
+                  onChangeText={v => setYear(v.replace(/[^0-9]/g, '').slice(0, 4))}
+                  onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === 'Backspace' && year === '') {
+                      setMonth(m => m.slice(0, -1));
+                      monthRef.current?.focus();
+                    }
+                  }}
+                  placeholder="YYYY" placeholderTextColor="rgba(255,255,255,0.2)" keyboardType="number-pad" maxLength={4}
+                />
+              </View>
+            )}
+
+            {!!error && <Text style={cm.errorText}>{error}</Text>}
+
+            <TouchableOpacity style={cm.primaryBtn} onPress={handleVerify} activeOpacity={0.85}>
+              <Text style={cm.primaryBtnText}>Verify</Text>
+            </TouchableOpacity>
+
+            {!!dob && (
+              <TouchableOpacity style={cm.ghostBtn} onPress={() => { setError(''); setMode(mode === 'pin' ? 'dob' : 'pin'); }}>
+                <Text style={cm.ghostBtnText}>{mode === 'pin' ? 'Forgot PIN? Verify with Date of Birth' : 'Back to PIN entry'}</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={cm.ghostBtn} onPress={close}><Text style={cm.ghostBtnText}>Cancel</Text></TouchableOpacity>
           </View>
         </TouchableOpacity>
       </KeyboardAvoidingView>
@@ -595,12 +705,20 @@ export default function SettingsScreen({ navigation }) {
   const [showDataManager, setShowDataManager] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState('');
-  const [editAge, setEditAge] = useState('');
+  const [editDobDay, setEditDobDay] = useState('');
+  const [editDobMonth, setEditDobMonth] = useState('');
+  const [editDobYear, setEditDobYear] = useState('');
+  const editDobDayRef = useRef(null);
+  const editDobMonthRef = useRef(null);
+  const editDobYearRef = useRef(null);
   const [editImage, setEditImage] = useState('');
   const [editCurrency, setEditCurrency] = useState('');
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
   const [pinSetupOpen, setPinSetupOpen] = useState(false);
+  const [pinModalMode, setPinModalMode] = useState('enable'); // 'enable' | 'change'
+  const [pinVerifyOpen, setPinVerifyOpen] = useState(false);
+  const [pinVerifyPurpose, setPinVerifyPurpose] = useState('disable'); // 'disable' | 'change'
   const [passExportOpen, setPassExportOpen] = useState(false);
   const [decryptModalOpen, setDecryptModalOpen] = useState(false);
   const [pendingEncContent, setPendingEncContent] = useState('');
@@ -612,8 +730,35 @@ export default function SettingsScreen({ navigation }) {
   const overlayColor = settings.darkMode ? 'rgba(0,0,0,0.82)' : 'rgba(44,51,32,0.55)';
   const s = makeStyles(colors);
 
-  const openEdit = () => { setEditName(settings.name || ''); setEditAge(settings.age || ''); setEditImage(settings.profileImage || ''); setEditCurrency(settings.currency || '₹'); setEditMode(true); };
-  const saveEdit = () => { updateSettings({ name: editName.trim(), age: editAge.trim(), profileImage: editImage, currency: editCurrency }); setEditMode(false); };
+  const openEdit = () => {
+    setEditName(settings.name || '');
+    const [y, m, d] = (settings.dob || '').split('-');
+    setEditDobDay(d || ''); setEditDobMonth(m || ''); setEditDobYear(y || '');
+    setEditImage(settings.profileImage || '');
+    setEditCurrency(settings.currency || '₹');
+    setEditMode(true);
+  };
+  const isEditDobValid = () => {
+    const d = parseInt(editDobDay, 10), m = parseInt(editDobMonth, 10), y = parseInt(editDobYear, 10);
+    if (!d || !m || !y || editDobYear.length !== 4) return false;
+    if (d < 1 || d > 31 || m < 1 || m > 12) return false;
+    if (y < 1900 || y > new Date().getFullYear()) return false;
+    const date = new Date(y, m - 1, d);
+    return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+  };
+  const saveEdit = () => {
+    const pad = n => String(n).padStart(2, '0');
+    const dobValid = isEditDobValid();
+    const dob = dobValid ? `${editDobYear}-${pad(editDobMonth)}-${pad(editDobDay)}` : (settings.dob || '');
+    updateSettings({
+      name: editName.trim(),
+      dob,
+      age: dob ? calculateAge(dob) : settings.age,
+      profileImage: editImage,
+      currency: editCurrency,
+    });
+    setEditMode(false);
+  };
   const cancelEdit = () => setEditMode(false);
 
   const pickProfileImage = async () => {
@@ -800,7 +945,47 @@ export default function SettingsScreen({ navigation }) {
                     <View style={s.cameraBadge}><CameraIcon color={colors.activePill} /></View>
                   </TouchableOpacity>
                   <TextInput style={s.editInput} value={editName} onChangeText={setEditName} placeholder="Name" placeholderTextColor={colors.textMuted} />
-                  <TextInput style={s.editInput} value={editAge} onChangeText={v => setEditAge(v.replace(/[^0-9]/g, ''))} placeholder="Age" keyboardType="number-pad" placeholderTextColor={colors.textMuted} />
+                  <Text style={s.editDobLabel}>Date of Birth <Text style={s.editDobLabelSub}>(used for Forgot PIN recovery)</Text></Text>
+                  <View style={s.editDobRow}>
+                    <TextInput
+                      ref={editDobDayRef}
+                      style={[s.editInput, s.editDobInput]} value={editDobDay}
+                      onChangeText={v => {
+                        const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                        setEditDobDay(clean);
+                        if (clean.length === 2) editDobMonthRef.current?.focus();
+                      }}
+                      placeholder="DD" keyboardType="number-pad" maxLength={2} placeholderTextColor={colors.textMuted} textAlign="center"
+                    />
+                    <TextInput
+                      ref={editDobMonthRef}
+                      style={[s.editInput, s.editDobInput]} value={editDobMonth}
+                      onChangeText={v => {
+                        const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                        setEditDobMonth(clean);
+                        if (clean.length === 2) editDobYearRef.current?.focus();
+                      }}
+                      onKeyPress={({ nativeEvent }) => {
+                        if (nativeEvent.key === 'Backspace' && editDobMonth === '') {
+                          setEditDobDay(d => d.slice(0, -1));
+                          editDobDayRef.current?.focus();
+                        }
+                      }}
+                      placeholder="MM" keyboardType="number-pad" maxLength={2} placeholderTextColor={colors.textMuted} textAlign="center"
+                    />
+                    <TextInput
+                      ref={editDobYearRef}
+                      style={[s.editInput, s.editDobInputYear]} value={editDobYear}
+                      onChangeText={v => setEditDobYear(v.replace(/[^0-9]/g, '').slice(0, 4))}
+                      onKeyPress={({ nativeEvent }) => {
+                        if (nativeEvent.key === 'Backspace' && editDobYear === '') {
+                          setEditDobMonth(m => m.slice(0, -1));
+                          editDobMonthRef.current?.focus();
+                        }
+                      }}
+                      placeholder="YYYY" keyboardType="number-pad" maxLength={4} placeholderTextColor={colors.textMuted} textAlign="center"
+                    />
+                  </View>
                   <View style={s.currencyChipsRow}>
                     {CURRENCIES.map(c => (
                       <TouchableOpacity key={c.sym} style={[s.currencyChip, editCurrency === c.sym && s.currencyChipActive]} onPress={() => setEditCurrency(c.sym)}>
@@ -823,11 +1008,30 @@ export default function SettingsScreen({ navigation }) {
                 <View style={s.rowInfo}><Text style={s.rowLabel}>Dark Mode</Text></View>
                 <Switch value={settings.darkMode} onValueChange={toggleDarkMode} trackColor={{ false: colors.border, true: colors.accentDark }} thumbColor={settings.darkMode ? colors.accent : colors.surface2} />
               </View>
-              <View style={[s.row, { borderBottomWidth: 0 }]}>
+              <View style={[s.row, !settings.appLockEnabled && { borderBottomWidth: 0 }]}>
                 <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>🔒</Text></View>
                 <View style={s.rowInfo}><Text style={s.rowLabel}>App Lock</Text><Text style={s.rowHint}>{settings.appLockEnabled ? 'Active' : 'Locked'}</Text></View>
-                <Switch value={settings.appLockEnabled} onValueChange={v => v ? setPinSetupOpen(true) : updateSettings({ appLockEnabled: false, appLockPin: '' })} trackColor={{ false: colors.border, true: colors.accentDark }} thumbColor={settings.appLockEnabled ? colors.accent : colors.surface2} />
+                <Switch
+                  value={settings.appLockEnabled}
+                  onValueChange={v => {
+                    if (v) { setPinModalMode('enable'); setPinSetupOpen(true); }
+                    else { setPinVerifyPurpose('disable'); setPinVerifyOpen(true); }
+                  }}
+                  trackColor={{ false: colors.border, true: colors.accentDark }}
+                  thumbColor={settings.appLockEnabled ? colors.accent : colors.surface2}
+                />
               </View>
+              {settings.appLockEnabled && (
+                <TouchableOpacity
+                  style={[s.row, { borderBottomWidth: 0 }]}
+                  onPress={() => { setPinVerifyPurpose('change'); setPinVerifyOpen(true); }}
+                  activeOpacity={0.7}
+                >
+                  <View style={[s.iconBox, { backgroundColor: colors.surface2 }]}><Text>🔑</Text></View>
+                  <View style={s.rowInfo}><Text style={s.rowLabel}>Change PIN</Text></View>
+                  <Text style={s.rowMuted}>›</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <TouchableOpacity style={s.sectionHeader} onPress={() => setShowDataManager(!showDataManager)} activeOpacity={0.7}>
@@ -902,7 +1106,31 @@ export default function SettingsScreen({ navigation }) {
         onDownloadLogout={handleDownloadThenLogout}
       />
       <ClearDataModal visible={clearModalOpen} onCancel={() => setClearModalOpen(false)} onConfirm={executeClear} />
-      <PinSetupModal visible={pinSetupOpen} onCancel={() => setPinSetupOpen(false)} onSave={p => { updateSettings({ appLockEnabled: true, appLockPin: p }); setPinSetupOpen(false); }} />
+      <PinSetupModal
+        visible={pinSetupOpen}
+        onCancel={() => setPinSetupOpen(false)}
+        confirmLabel={pinModalMode === 'enable' ? 'Enable Lock' : 'Save PIN'}
+        onSave={p => {
+          if (pinModalMode === 'enable') updateSettings({ appLockEnabled: true, appLockPin: p });
+          else updateSettings({ appLockPin: p });
+          setPinSetupOpen(false);
+        }}
+      />
+      <PinVerifyModal
+        visible={pinVerifyOpen}
+        currentPin={settings.appLockPin}
+        dob={settings.dob}
+        onCancel={() => setPinVerifyOpen(false)}
+        onVerified={() => {
+          setPinVerifyOpen(false);
+          if (pinVerifyPurpose === 'disable') {
+            updateSettings({ appLockEnabled: false, appLockPin: '' });
+          } else {
+            setPinModalMode('change');
+            setPinSetupOpen(true);
+          }
+        }}
+      />
       <CsvExportModal
         visible={csvModalOpen}
         onCancel={() => setCsvModalOpen(false)}
@@ -954,6 +1182,11 @@ const makeStyles = (colors) => StyleSheet.create({
   editAvatarInitials: { fontSize: 28, color: colors.activePill, fontFamily: fonts.heavy },
   cameraBadge: { position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.surface },
   editInput: { backgroundColor: colors.surface2, borderRadius: radius.md, padding: 12, color: colors.textPrimary, fontFamily: fonts.bold, marginBottom: 12 },
+  editDobLabel: { fontSize: 11, color: colors.textMuted, fontFamily: fonts.bold, marginBottom: 8, letterSpacing: 0.5 },
+  editDobLabelSub: { fontFamily: fonts.regular, textTransform: 'none', letterSpacing: 0 },
+  editDobRow: { flexDirection: 'row', gap: 8 },
+  editDobInput: { flex: 1 },
+  editDobInputYear: { flex: 1.5 },
   currencyChipsRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
   currencyChip: { padding: 10, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.border, width: 44, alignItems: 'center' },
   currencyChipActive: { backgroundColor: colors.accent, borderColor: colors.accent },
@@ -999,4 +1232,7 @@ const cm = StyleSheet.create({
   destructiveBtnText: { fontFamily: 'Fungis-Bold', fontSize: 15, color: '#D4918F' },
   ghostBtn: { padding: 14, alignItems: 'center' },
   ghostBtnText: { fontFamily: 'Fungis-Regular', fontSize: 14, color: 'rgba(255,255,255,0.4)' },
+  dobRow: { flexDirection: 'row', gap: 10 },
+  dobInput: { flex: 1, textAlign: 'center' },
+  dobInputYear: { flex: 1.5, textAlign: 'center' },
 });

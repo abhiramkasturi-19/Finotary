@@ -40,8 +40,8 @@ const FEATURES = [
     desc: 'Manage multiple spending contexts (e.g., Personal, Business). Transactions are tagged to the active wallet. Switch wallets via the avatar or wallet pill on the home screen.',
   },
   {
-    title: 'App Lock',
-    desc: 'Secure your financial data with a 4-digit PIN. Enable this in Settings → Preferences. The lock triggers whenever you return to the app.',
+    title: 'App Lock & PIN',
+    desc: 'Secure your data with a 4-digit PIN. Tap "Forgot PIN?" on the lock screen and verify your Date of Birth to set a new PIN. You can change your PIN in Settings anytime using your current PIN or Date of Birth.',
   },
   {
     title: 'Export & Encrypt',

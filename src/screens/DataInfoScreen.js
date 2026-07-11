@@ -18,6 +18,11 @@ const DATA_FEATURES = [
     desc: 'All your financial data is stored locally. We never see it, track it, or sell it. Your account is essentially your JSON backup file.',
   },
   {
+    icon: '🔑',
+    title: 'PIN Recovery',
+    desc: 'Date of Birth is collected during signup and stored locally only. It is used exclusively as a recovery hint for the App Lock PIN — never transmitted anywhere.',
+  },
+  {
     icon: '📤',
     title: 'Export & Encrypt',
     desc: 'Download regular backups or securely encrypt (.enc) your records with a passcode.',
