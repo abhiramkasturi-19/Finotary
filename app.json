@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Finotary",
-    "slug": "Finotary",
+    "slug": "Finova",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#222222"
     },
     "ios": {
       "supportsTablet": true,
@@ -32,24 +32,25 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-   "plugins": [
-  "@react-native-community/datetimepicker",
-  "expo-sharing",
-  [
-    "expo-font",
-    {
-      "fonts": [
-        "./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Regular.ttf",
-        "./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Bold.ttf",
-        "./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Heavy.ttf"
+    "plugins": [
+      "@react-native-community/datetimepicker",
+      "expo-sharing",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Regular.ttf",
+            "./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Bold.ttf",
+            "./assets/FUNGIS/fonts/OpenType-TT/FUNGIS Heavy.ttf"
+          ]
+        }
       ]
-    }
-  ]
-],
+    ],
     "extra": {
       "eas": {
         "projectId": "4731b222-486b-4391-92ec-f3282b723762"
       }
-    }
+    },
+    "owner": "abhiramkasturi-19"
   }
 }
