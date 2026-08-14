@@ -2,7 +2,7 @@
   "expo": {
     "name": "Finotary",
     "slug": "Finova",
-    "version": "1.0.1",
+    "version": "1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,12 +13,13 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.abhiramkasturi19.Finotary",
+      "bundleIdentifier": "com.abhiramkasturi19.finotary",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
+      "versionCode": 3,
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -26,8 +27,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.abhiramkasturi19.Finotary",
-      "versionCode": 1
+      "package": "com.abhiramkasturi19.finotary"
     },
     "web": {
       "favicon": "./assets/favicon.png"

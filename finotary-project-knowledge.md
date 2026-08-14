@@ -46,9 +46,9 @@
 **Note on Package Name / Bundle Identifier:** The package name/bundle identifier change (from `com.abhiramkasturi19.Finova` to `com.abhiramkasturi19.Finotary` in `app.json`) only applies if no build has been uploaded to the Play Console yet under the old name.
 
 ### Current App Version
-**1.0.1 — Version Reset + Pro Persistence Fix + Demo Theme Fix + Demo Exit Symmetry + Keyboard Coverage Fix**
+**1.0 — Version Reset + Pro Persistence Fix + Demo Theme Fix + Demo Exit Symmetry + Keyboard Coverage Fix**
 
-### Delivered Files (v1.0.1)
+### Delivered Files (v1.0)
 
 | File | Action | Destination |
 |---|---|---|
@@ -58,7 +58,7 @@
 | LoginScreen.js | Replace | src/screens/LoginScreen.js |
 | app.json | Replace | app.json (root) |
 
-### Previously Delivered Files (v1.0.1, still current)
+### Previously Delivered Files (v1.0, still current)
 
 | File | Destination |
 |---|---|
@@ -154,11 +154,11 @@ Custom: 25-colour DESIGNER_PALETTE in AppContext. Free: max 3. Pro: unlimited.
 ### 10.1 WelcomeScreen
 Root. Get Started → CreateAccount. Log In → Login. No back button.
 
-### 10.2 LoginScreen *(updated v1.0.1)*
+### 10.2 LoginScreen *(updated v1.0)*
 JSON backup → validate → importData() → hasOnboarded:'true' → reset to Main.
 Auto-detects FINOTARY_ENC: or FINOTARY_ENC2: prefix → DecryptImportModal.
 
-**DecryptImportModal keyboard fix (v1.0.1):**
+**DecryptImportModal keyboard fix (v1.0):**
 The `DecryptImportModal` password `TextInput` is wrapped in `KeyboardAvoidingView` with `behavior={Platform.OS === 'ios' ? 'padding' : 'height'}`. Outer container uses `justifyContent:'flex-end'` and `marginBottom:40` so the input floats above the keyboard. `softwareKeyboardLayoutMode:'pan'` in `app.json` provides the base Android fix.
 
 ### 10.3 CreateAccountScreen
@@ -172,7 +172,7 @@ SafeAreaView paddingTop:-50 paddingBottom:-100. Always dark.
 ### 10.5 AppGuideScreen
 panDownManual. Internal Animated.View spring slide-up. stiffness:240, damping:26. Immediate goBack() on close.
 
-### 10.6 SettingsScreen *(updated v1.0.1)*
+### 10.6 SettingsScreen *(updated v1.0)*
 **File:** `src/screens/SettingsScreen.js`
 
 Profile card view mode shows **👑 PRO badge** if `isPro`. Active wallet name shown below meta line (if not default wallet).
@@ -181,11 +181,11 @@ Profile card view mode shows **👑 PRO badge** if `isPro`. Active wallet name s
 - Dark Mode toggle (unchanged)
 - App Lock toggle — Pro-gated. If not Pro → navigates to ProPaywall. If Pro + toggled ON → opens `PinSetupModal`.
 
-**PinSetupModal keyboard fix (v1.0.1):**
+**PinSetupModal keyboard fix (v1.0):**
 Modal content is vertically centred (`justifyContent:'center'`). Hidden autofocus `TextInput` for PIN capture uses `style={{ position:'absolute', opacity:0, height:0 }}`. Modal inner container has `paddingBottom:300` to ensure scroll room when keyboard opens. `softwareKeyboardLayoutMode:'pan'` in `app.json` handles the base Android behaviour.
 
 **DATA MANAGEMENT section (collapsible):**
-- **Try Demo / Exit Demo** — same row, conditional on `isDemoMode` (v1.0.1):
+- **Try Demo / Exit Demo** — same row, conditional on `isDemoMode` (v1.0):
   - When `isDemoMode === false`: shows "Try Demo" (👀) row — loads `DEMO_DATA`
   - When `isDemoMode === true`: shows "Exit Demo" (🚪) row — calls `exitDemo()`
   - The `DemoBanner` Exit button in App.js remains as a persistent secondary exit available from any screen
@@ -212,35 +212,35 @@ Uses `AsyncStorage.setItem` — **never** `AsyncStorage.clear()`.
 **Logout Options:**
 `LogoutModal` renders 2 explicit paths. Free users interacting with the Download option are routed to ProPaywall.
 
-### 10.7 AddTransactionScreen *(v1.0.1)*
+### 10.7 AddTransactionScreen *(v1.0)*
 panDownManual. Own Animated.View spring slide-up. stiffness:240. Immediate goBack() on close. maxLength={12}. paddingBottom:120. **No KAV — Rule 26.**
 Custom category gate: checks return value of addCustomCategory. 'limit_reached' → ErrorModal with ProPaywall action. 'demo_mode' → silently ignored.
 Wallet tagging automatic — addTransaction() tags with activeWalletId.
 Date validation: validates .getDate/.getMonth/.getFullYear match to catch Feb 31 rollover.
 
-### 10.8 HomeScreen *(v1.0.1)*
+### 10.8 HomeScreen *(v1.0)*
 Uses `activeTransactions` (wallet-filtered). Wallet name pill on card top row (→ WalletsScreen). Avatar tap → WalletsScreen. Balance Text: `adjustsFontSizeToFit` + `numberOfLines={1}`.
 
-### 10.9 ActivityScreen *(v1.0.1)*
+### 10.9 ActivityScreen *(v1.0)*
 Uses `activeTransactions`. Calendar heat-map wallet-aware. Heat intensity thresholds: <500 light, <2000 medium, <5000 bright, ≥5000 full. Transaction Search Pro-gated.
 
-### 10.10 StatsScreen *(v1.0.1)*
+### 10.10 StatsScreen *(v1.0)*
 Uses `activeTransactions`. Filters: Week/Month/3 Month/6 Month/Year. Month view label step: n <= 31 ? 2 : Math.max(1, Math.ceil(n/10)).
 
-### 10.11 ProPaywallScreen *(v1.0.1)*
+### 10.11 ProPaywallScreen *(v1.0)*
 Background: #090A09. panDownManual. Own Animated.View spring. stiffness:240. TEST MODE: 900ms delay → updatePro(true) → goBack(). Immediate goBack() on close.
 
-### 10.12 WalletsScreen *(v1.0.1)*
+### 10.12 WalletsScreen *(v1.0)*
 **panDownManual — NO internal Animated.View.** The preset handles all animation. Adding one causes double-animation conflict. Immediate goBack() on close.
 walletToDelete and setWalletToDelete MUST be useState(null). Default wallet (id:'default') cannot be deleted or archived. Delete migrates transactions to 'default'. Pro-gated wallet creation.
 
-### 10.13 Demo Mode *(v1.0.1 — theme + exit fixes)*
+### 10.13 Demo Mode *(v1.0 — theme + exit fixes)*
 Activated: Settings → DATA MANAGEMENT → Try Demo.
 Loads DEMO_DATA from src/data/demoData.js. isDemoMode:true. _realStateSnapshot saved. ALL writes silently blocked EXCEPT darkMode toggle. AsyncStorage NEVER written.
 
-**Theme in demo (v1.0.1 fix):** Demo loads with the user's real `darkMode` preference, not `DEMO_DATA.settings.darkMode`. `LOAD_DEMO` reducer explicitly copies `state.settings.darkMode` into the demo state. `toggleDarkMode()` / `UPDATE_SETTINGS` with only `darkMode` key is unblocked in demo — all other settings writes remain blocked.
+**Theme in demo (v1.0 fix):** Demo loads with the user's real `darkMode` preference, not `DEMO_DATA.settings.darkMode`. `LOAD_DEMO` reducer explicitly copies `state.settings.darkMode` into the demo state. `toggleDarkMode()` / `UPDATE_SETTINGS` with only `darkMode` key is unblocked in demo — all other settings writes remain blocked.
 
-**Exit options (v1.0.1):**
+**Exit options (v1.0):**
 1. DemoBanner "Exit" button — always visible at top of every screen during demo
 2. Settings → DATA MANAGEMENT → "Exit Demo" row — same location as "Try Demo"
 
@@ -254,7 +254,7 @@ AppLockOverlay wraps {children} in View with marginTop: isDemoMode ? DEMO_BANNER
 
 **File:** `src/context/AppContext.js` | **Hook:** `useApp()`
 
-### State Shape *(v1.0.1)*
+### State Shape *(v1.0)*
 ```js
 {
   transactions: [],
@@ -276,7 +276,7 @@ AppLockOverlay wraps {children} in View with marginTop: isDemoMode ? DEMO_BANNER
 }
 ```
 
-### Persist useEffect — CRITICAL RULE (v1.0.1)
+### Persist useEffect — CRITICAL RULE (v1.0)
 ```js
 useEffect(() => {
   // NEVER persist during demo mode — demo data must never overwrite real user data
@@ -286,7 +286,7 @@ useEffect(() => {
 ```
 The `isDemoMode` guard is non-negotiable. Without it, demo state overwrites real Pro status and transactions.
 
-### LOAD_DEMO reducer — CRITICAL RULE (v1.0.1)
+### LOAD_DEMO reducer — CRITICAL RULE (v1.0)
 ```js
 case 'LOAD_DEMO': {
   const snapshot = {
@@ -308,7 +308,7 @@ case 'LOAD_DEMO': {
 }
 ```
 
-### EXIT_DEMO reducer — CRITICAL RULE (v1.0.1)
+### EXIT_DEMO reducer — CRITICAL RULE (v1.0)
 ```js
 case 'EXIT_DEMO': {
   const snapshot = state._realStateSnapshot;
@@ -322,7 +322,7 @@ case 'EXIT_DEMO': {
 ```
 NEVER return initialState if snapshot exists — this wipes real Pro status.
 
-### UPDATE_SETTINGS in demo — darkMode exception (v1.0.1)
+### UPDATE_SETTINGS in demo — darkMode exception (v1.0)
 ```js
 case 'UPDATE_SETTINGS': {
   if (state.isDemoMode) {
@@ -339,7 +339,7 @@ case 'UPDATE_SETTINGS': {
 ### LOAD_DATA — isPro security rule
 `LOAD_DATA` (used by importData / backup restore) MUST strip `isPro`, `appLockEnabled`, `appLockPin` from the incoming payload to prevent privilege injection via backup file. It reads these correctly from `@flo_data` on startup — the stripping applies only to the importData() flow.
 
-### Key Actions *(v1.0.1)*
+### Key Actions *(v1.0)*
 | Method | Purpose | Notes |
 |---|---|---|
 | `addTransaction(txn)` | Prepends with id + walletId | Blocked in demo |
@@ -347,7 +347,7 @@ case 'UPDATE_SETTINGS': {
 | `deleteTransaction(id)` | Filter by id | Blocked in demo |
 | `updateSettings(partial)` | Merges settings | Blocked in demo EXCEPT darkMode |
 | `updatePro(bool)` | Sets settings.isPro | Blocked in demo |
-| `toggleDarkMode()` | Shorthand | Allowed in demo (v1.0.1) |
+| `toggleDarkMode()` | Shorthand | Allowed in demo (v1.0) |
 | `addCustomCategory(type, name)` | Returns 'limit_reached', 'ok', 'demo_mode' | Free limit: 3 |
 | `deleteCustomCategory(type, name)` | Filter | Blocked in demo |
 | `addWallet(name, icon)` | Returns 'requires_pro', 'ok', 'demo_mode' | Pro-gated |
@@ -360,7 +360,7 @@ case 'UPDATE_SETTINGS': {
 | `enterDemo()` | Dispatches LOAD_DEMO | |
 | `exitDemo()` | Dispatches EXIT_DEMO, restores snapshot | |
 
-### isPro & App Lock persistence *(clarified v1.0.1)*
+### isPro & App Lock persistence *(clarified v1.0)*
 - `isPro`, `appLockEnabled`, `appLockPin` are in `settings` → persisted in `@flo_data`
 - Survive: `executeClear` ✅, app background/foreground ✅, app restart ✅
 - **Persist useEffect skips when `isDemoMode:true`** — real state (including isPro) remains unchanged in storage while demo runs
@@ -391,7 +391,7 @@ value={{
 | `AuthFlow` | Onboarding screens with spring slide animation. |
 | `BrandedSplash` | 2s branded splash on every cold launch. Holds 1.4s, fades + scales out 0.6s. |
 
-### Transition Presets *(v1.0.1)*
+### Transition Presets *(v1.0)*
 ```js
 const DARK          = { contentStyle: { backgroundColor: '#111' } };
 const panDownManual = { presentation:'transparentModal', animation:'none', ...DARK };
@@ -400,7 +400,7 @@ const fadeIn        = { animation:'fade', animationDuration:280, ...DARK };
 const noAnim        = { animation:'none', ...DARK };
 ```
 
-### Screen → Preset mapping *(v1.0.1 — current)*
+### Screen → Preset mapping *(v1.0 — current)*
 | Screen | Preset | Internal animation |
 |---|---|---|
 | Welcome (AuthFlow) | noAnim | spring (internal) |
@@ -428,7 +428,7 @@ setLocked(true);
 
 ## 14. NAVIGATION STRUCTURE
 
-### Key flows *(v1.0.1)*
+### Key flows *(v1.0)*
 ```
 Free user hits custom cat limit:
   AddTransactionScreen → 'limit_reached' → ErrorModal → ProPaywall
@@ -514,7 +514,7 @@ XOR encryption — FINOTARY_ENC2: format: salt + hash-derived key + positional s
 | # | Change | Files |
 |---|---|---|
 | 49–135 | v2.6.0 through v2.8.0 | — |
-| 136–170 | v2.9.0 through v1.0.1 (Pro System, App Lock, Wallets, Search, Demo Mode) | — |
+| 136–170 | v2.9.0 through v1.0 (Pro System, App Lock, Wallets, Search, Demo Mode) | — |
 | 171 | WalletsScreen transition changed from slideRight to panDownManual | App.js |
 | 172 | WalletsScreen internal Animated.View removed | WalletsScreen.js |
 | 173 | walletToDelete useState(null) added | WalletsScreen.js |
@@ -535,7 +535,7 @@ XOR encryption — FINOTARY_ENC2: format: salt + hash-derived key + positional s
 | 188 | **PinSetupModal keyboard fix** — vertically centred, paddingBottom:300 | SettingsScreen.js |
 | 189 | **DecryptImportModal KAV fix** — KAV + justifyContent flex-end + marginBottom:40 | LoginScreen.js |
 | 190 | **softwareKeyboardLayoutMode:'pan'** added to app.json android section | app.json |
-| 191 | Version bumped to 1.0.1 | KB |
+| 191 | Version bumped to 1.0 | KB |
 
 ---
 
@@ -601,7 +601,7 @@ Offset is in AppLockOverlay only. Never add per-screen padding.
 Local AsyncStorage flag. LOAD_DATA strips isPro from backup payload — cannot be injected via backup file. RevenueCat receipt validation in v3.1.0.
 
 ### Demo Mode security
-Never written to AsyncStorage. All writes are pure no-op except darkMode toggle (v1.0.1). No toast or error on blocked actions.
+Never written to AsyncStorage. All writes are pure no-op except darkMode toggle (v1.0). No toast or error on blocked actions.
 
 ### App Lock security
 PIN stored as plaintext in AsyncStorage. Convenience lock, not security guarantee. Cold-boot protected: fires on mount AND AppState. Fully bypassed in demo mode.
@@ -624,7 +624,7 @@ PIN stored as plaintext in AsyncStorage. Convenience lock, not security guarante
 12. **`profileImage` is base64 data URI.**
 13. **JSON backup contains everything** including wallets and activeWalletId.
 14. **AddTransaction + AppGuide + Wallets all use `panDownManual`.**
-15. **Wallets uses `panDownManual`** — changed from slideRight in v1.0.1. Do NOT revert.
+15. **Wallets uses `panDownManual`** — changed from slideRight in v1.0. Do NOT revert.
 16. **No spring-down exit on any panDownManual screen** — immediate goBack() on all.
 17. **Tab bar: `elevation:100`.** Inactive: `display:'none'`.
 18. **Tab.Navigator NOT used** — MainTabs is custom.
@@ -641,7 +641,7 @@ PIN stored as plaintext in AsyncStorage. Convenience lock, not security guarante
 29. **`darkColors.bg` is `'#222629'`.**
 30. **HomeScreen rows are tappable** — TouchableOpacity wrapping.
 31. **Stats filters: `['Week','Month','3 Month','6 Month','Year']`.**
-32. **Version is `1.0.1`.**
+32. **Version is `1.0`.**
 33. **Negative SafeAreaView padding is intentional** — `paddingTop:-50`, `paddingBottom:-100`.
 34. **AddTransaction and AppGuide spring stiffness is `240`, damping `26`.**
 35. **WalletsScreen uses `panDownManual`** — NO internal Animated.View.
@@ -656,7 +656,7 @@ PIN stored as plaintext in AsyncStorage. Convenience lock, not security guarante
 47. **No OS Alerts** — use MessageModal or RestoreConfirmModal.
 48. **`walletToDelete` and `setWalletToDelete` MUST be `useState(null)` in WalletsScreen.**
 49. **HomeScreen balance `Text` MUST have `adjustsFontSizeToFit` and `numberOfLines={1}`.**
-50. **Demo mode writes are ALL silently blocked** — except darkMode toggle (v1.0.1).
+50. **Demo mode writes are ALL silently blocked** — except darkMode toggle (v1.0).
 51. **Demo data NEVER persists to AsyncStorage** — persist useEffect skips when `isDemoMode:true`.
 52. **`EXIT_DEMO` restores `_realStateSnapshot`** — never returns initialState if snapshot exists.
 53. **Demo transaction `category` field uses lowercase ids** — never title case labels.
@@ -666,14 +666,14 @@ PIN stored as plaintext in AsyncStorage. Convenience lock, not security guarante
 57. **Activity heatmap thresholds:** <500 light, <2000 medium, <5000 bright, ≥5000 full.
 58. **`+ New` chip Pro Gate enforced in `onPress`** — check isPro && cats.length >= 3.
 59. **Monochrome Icon:** transparent PNG, single colour, 108x108px (72x72px safe zone).
-60. **Persist useEffect MUST have `if (state.isDemoMode) return` guard** — demo data must never overwrite real state in AsyncStorage. (v1.0.1)
-61. **LOAD_DEMO MUST preserve `state.settings.darkMode`** — demo renders in user's real theme. (v1.0.1)
-62. **EXIT_DEMO MUST return full `_realStateSnapshot`** — never initialState. (v1.0.1)
-63. **UPDATE_SETTINGS in demo: unblock darkMode-only writes** — all other settings remain blocked. (v1.0.1)
-64. **Settings Try Demo / Exit Demo is a single conditional row** — same location, same section, switches based on isDemoMode. (v1.0.1)
-65. **`softwareKeyboardLayoutMode:'pan'` MUST be in `app.json` android section** — base fix for all keyboard coverage issues. (v1.0.1)
-66. **PinSetupModal: vertically centred, paddingBottom:300** — keyboard must not cover PIN dots. (v1.0.1)
-67. **DecryptImportModal in LoginScreen: KAV + justifyContent flex-end + marginBottom:40** — keyboard must not cover password input. (v1.0.1)
+60. **Persist useEffect MUST have `if (state.isDemoMode) return` guard** — demo data must never overwrite real state in AsyncStorage. (v1.0)
+61. **LOAD_DEMO MUST preserve `state.settings.darkMode`** — demo renders in user's real theme. (v1.0)
+62. **EXIT_DEMO MUST return full `_realStateSnapshot`** — never initialState. (v1.0)
+63. **UPDATE_SETTINGS in demo: unblock darkMode-only writes** — all other settings remain blocked. (v1.0)
+64. **Settings Try Demo / Exit Demo is a single conditional row** — same location, same section, switches based on isDemoMode. (v1.0)
+65. **`softwareKeyboardLayoutMode:'pan'` MUST be in `app.json` android section** — base fix for all keyboard coverage issues. (v1.0)
+66. **PinSetupModal: vertically centred, paddingBottom:300** — keyboard must not cover PIN dots. (v1.0)
+67. **DecryptImportModal in LoginScreen: KAV + justifyContent flex-end + marginBottom:40** — keyboard must not cover password input. (v1.0)
 
 ---
 
@@ -688,10 +688,10 @@ PIN stored as plaintext in AsyncStorage. Convenience lock, not security guarante
 | Backup checksum | v3.1.0 | Version + hash |
 | Cross-wallet Stats view | v3.1.0 | Toggle in StatsScreen |
 | Demo onboarding entry | v3.1.0 | Try Demo on WelcomeScreen |
-| AppGuide footnote update | v1.0.1.x | Update version reference |
+| AppGuide footnote update | v1.0.x | Update version reference |
 
 ---
 
 *Last updated: May 12, 2026*
-*Version: 1.0.1 — Pro Persistence Fix + Demo Theme Fix + Demo Exit Symmetry + Keyboard Coverage Fix*
+*Version: 1.0 — Pro Persistence Fix + Demo Theme Fix + Demo Exit Symmetry + Keyboard Coverage Fix*
 *Developer: Abhiram Kasturi*

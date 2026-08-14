@@ -1,5 +1,5 @@
 // src/screens/WalletsScreen.js
-// Finotary v1.0.1 — Wallet manager: create, switch, archive, delete wallets
+// Finotary v1.0 — Wallet manager: create, switch, archive, delete wallets
 
 import React, { useState, useRef, useEffect } from 'react';
 import {

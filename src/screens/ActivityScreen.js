@@ -1,5 +1,5 @@
 // src/screens/ActivityScreen.js
-// Finotary v1.0.1 — Transaction search (Pro) · Wallet-aware filtering
+// Finotary v1.0 — Transaction search (Pro) · Wallet-aware filtering
 
 import React, { useMemo, useState, useRef } from 'react';
 import {

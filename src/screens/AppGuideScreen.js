@@ -1,5 +1,5 @@
 // src/screens/AppGuideScreen.js
-// Finotary v1.0.1 — In-app usage guide
+// Finotary v1.0 — In-app usage guide
 
 import React, { useEffect, useRef } from 'react';
 import {
@@ -123,7 +123,7 @@ export default function AppGuideScreen({ navigation }) {
             </View>
           ))}
 
-          <Text style={styles.footnote}>Finotary v1.0.1 · Your data, your privacy.</Text>
+          <Text style={styles.footnote}>Finotary v1.0 · Your data, your privacy.</Text>
           <View style={{ height: 40 }} />
         </ScrollView>
         </Animated.View>

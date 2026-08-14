@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// App.js  —  ADDITIONS for Finotary v1.0.1
+// App.js  —  ADDITIONS for Finotary v1.0
 // ─────────────────────────────────────────────────────────────────────────────
 // Instructions: Merge these additions into your existing App.js.
 // The goal is to: (a) check AsyncStorage on startup, and (b) show onboarding

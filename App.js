@@ -1,4 +1,4 @@
-// App.js — Finotary v1.0.1
+// App.js — Finotary v1.0
 // Added: ProPaywallScreen · WalletsScreen · AppLock PIN overlay
 
 import React, { useEffect, useCallback, useState, useRef } from 'react';

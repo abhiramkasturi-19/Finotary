@@ -1,5 +1,5 @@
 // src/screens/WelcomeScreen.js
-// Finotary v1.0.1 — Onboarding Page 1 — Get Started + Log In
+// Finotary v1.0 — Onboarding Page 1 — Get Started + Log In
 
 import React from 'react';
 import {

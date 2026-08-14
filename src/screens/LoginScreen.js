@@ -1,5 +1,5 @@
 // src/screens/LoginScreen.js
-// Finotary v1.0.1 — Log In via JSON, Encrypted, or CSV backup
+// Finotary v1.0 — Log In via JSON, Encrypted, or CSV backup
 
 import React, { useState } from 'react';
 import {

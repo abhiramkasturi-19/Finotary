@@ -40,18 +40,21 @@ export default function DonutChart({
   }
 
   let cursor = -Math.PI / 2;
-  const slices = data.map(d => {
-    const fullSweep  = (d.value / total) * 2 * Math.PI;
-    const arcSweep   = fullSweep - gap;
-    const startAngle = cursor + gap / 2;
-    cursor += fullSweep;
-    return {
-      ...d,
-      startAngle,
-      sweep: arcSweep,
-      pct: Math.round((d.value / total) * 100),
-    };
-  });
+const slices = data.map(d => {
+  const fullSweep  = (d.value / total) * 2 * Math.PI;
+  // Clamp so tiny slices (smaller than the gap) never go negative —
+  // a negative strokeDasharray is invalid SVG and can render as a
+  // full solid circle, painting over every other slice.
+  const arcSweep   = Math.max(fullSweep - gap, fullSweep * 0.5);
+  const startAngle = cursor + gap / 2;
+  cursor += fullSweep;
+  return {
+    ...d,
+    startAngle,
+    sweep: arcSweep,
+    pct: Math.round((d.value / total) * 100),
+  };
+});
 
   const degOf = (rad) => (rad * 180) / Math.PI;
 

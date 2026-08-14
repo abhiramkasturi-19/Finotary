@@ -1,5 +1,5 @@
 // src/context/AppContext.js
-// Finotary v1.0.1 — Pro system · Wallets · App Lock · CSV/Passcode Export · Search · Demo Mode
+// Finotary v1.0 — Pro system · Wallets · App Lock · CSV/Passcode Export · Search · Demo Mode
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';

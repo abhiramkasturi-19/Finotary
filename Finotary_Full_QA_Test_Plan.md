@@ -1,5 +1,5 @@
 # FINOTARY — FULL QA TEST PLAN
-## Complete Feature Test Checklist (Base Build → v1.0.1)
+## Complete Feature Test Checklist (Base Build → v1.0)
 
 > **Role for whoever runs this:** You are the tester. Go through every section in order, physically perform each step on the device, and record the actual result next to the expected result. Do not assume — tap it, break it, try to break it. At the end, fill in the **Final Test Report** section with everything you found, pass or fail.
 
@@ -158,7 +158,7 @@ Test on a real Android device via the dev-client APK (never Expo Go — it canno
 
 ---
 
-## 10. CSV EXPORT (UPDATED FEATURE — v1.0.1)
+## 10. CSV EXPORT (UPDATED FEATURE — v1.0)
 
 | # | Test | Expected | Actual | Status | Notes |
 |---|---|---|---|---|---|
@@ -171,7 +171,7 @@ Test on a real Android device via the dev-client APK (never Expo Go — it canno
 
 ---
 
-## 11. DOWNLOAD DATA / JSON BACKUP (PRO — UPDATED FEATURE — v1.0.1)
+## 11. DOWNLOAD DATA / JSON BACKUP (PRO — UPDATED FEATURE — v1.0)
 
 | # | Test | Expected | Actual | Status | Notes |
 |---|---|---|---|---|---|
@@ -236,7 +236,7 @@ Test on a real Android device via the dev-client APK (never Expo Go — it canno
 
 ---
 
-## 16. VERSION & BRANDING AUDIT (v1.0.1 RESET)
+## 16. VERSION & BRANDING AUDIT (v1.0 RESET)
 
 | # | Test | Expected | Actual | Status | Notes |
 |---|---|---|---|---|---|
@@ -253,7 +253,7 @@ Test on a real Android device via the dev-client APK (never Expo Go — it canno
 
 **Tester name:** Antigravity (AI Auditor)
 **Device / Android version:** Static Codebase Audit
-**App version tested:** 1.0.1
+**App version tested:** 1.0
 **Date tested:** 2026-07-06
 
 ### Summary

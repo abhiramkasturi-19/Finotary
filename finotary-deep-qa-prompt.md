@@ -1,4 +1,4 @@
-# Finotary v1.0.1 — Deep QA & Exhaustive Bug Hunt Prompt
+# Finotary v1.0 — Deep QA & Exhaustive Bug Hunt Prompt
 ## Run this MULTIPLE TIMES across FREE mode, PRO mode, and DEMO mode
 
 ---
@@ -7,7 +7,7 @@
 
 ---
 
-*You are a senior React Native QA engineer and UI/UX specialist. Your job is to exhaustively test every pixel, every function, every edge case, and every flow in Finotary v1.0.1. No detail is too small. Test the app three times in three modes: FREE, PRO, DEMO. For every single test item below, report PASS, FAIL, or BUG with full detail. If it fails, give the exact file, exact function name, and exact fix.*
+*You are a senior React Native QA engineer and UI/UX specialist. Your job is to exhaustively test every pixel, every function, every edge case, and every flow in Finotary v1.0. No detail is too small. Test the app three times in three modes: FREE, PRO, DEMO. For every single test item below, report PASS, FAIL, or BUG with full detail. If it fails, give the exact file, exact function name, and exact fix.*
 
 ---
 
@@ -195,7 +195,7 @@
 - [ ] "Log Out + Download" for free user → routes to ProPaywall (not download)
 - [ ] "Log Out without Download" → clears all data including hasOnboarded → navigates to WelcomeScreen
 - [ ] After logout, reopening app shows WelcomeScreen
-- [ ] Creator credit "crafted by Abhiram Kasturi" and "Finotary · v1.0.1" always visible at bottom
+- [ ] Creator credit "crafted by Abhiram Kasturi" and "Finotary · v1.0" always visible at bottom
 - [ ] ScrollView has paddingBottom:100 so bottom items clear the tab bar
 
 ---

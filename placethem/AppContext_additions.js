@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// AppContext.js  —  ADDITIONS for Finotary v1.0.1
+// AppContext.js  —  ADDITIONS for Finotary v1.0
 // ─────────────────────────────────────────────────────────────────────────────
 // Instructions: Merge these additions into your existing AppContext.js.
 // Sections are clearly marked. Do NOT replace the whole file — only add/edit

@@ -1,5 +1,5 @@
 // src/screens/AddTransactionScreen.js
-// Finotary v1.0.1 — handles addCustomCategory 'limit_reached' (Pro gate on custom categories)
+// Finotary v1.0 — handles addCustomCategory 'limit_reached' (Pro gate on custom categories)
 
 import React, { useState, useRef, useEffect } from 'react';
 import {

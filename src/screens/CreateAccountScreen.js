@@ -1,5 +1,5 @@
 // src/screens/CreateAccountScreen.js
-// Finotary v1.0.1 — Onboarding Page 2 — custom crop modal
+// Finotary v1.0 — Onboarding Page 2 — custom crop modal
 
 import React, { useState, useRef } from 'react';
 import {
@@ -116,7 +116,7 @@ function TermsModal({ visible, onClose }) {
             ))}
             <View style={modal.footerNote}>
               <Text style={modal.footerText}>
-                Finotary v1.0.1{'\n'}© 2026 Abhiram Kasturi. All rights reserved.
+                Finotary v1.0{'\n'}© 2026 Abhiram Kasturi. All rights reserved.
               </Text>
             </View>
             <View style={{ height: 8 }} />

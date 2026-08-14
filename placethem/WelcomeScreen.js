@@ -1,5 +1,5 @@
 // screens/WelcomeScreen.js
-// Finotary v1.0.1 — Onboarding Page 1
+// Finotary v1.0 — Onboarding Page 1
 // Full-screen splash background, bottom shadow, headline, decorative lines, CTA
 
 import React from 'react';

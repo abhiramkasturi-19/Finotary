@@ -1,6 +1,6 @@
-# Deep QA Audit Report — Finotary v1.0.1
+# Deep QA Audit Report — Finotary v1.0
 **Audit Date:** Saturday, 21 March 2026
-**Target Version:** v1.0.1 (Pro System + App Lock + Multiple Wallets + Search + Demo Mode)
+**Target Version:** v1.0 (Pro System + App Lock + Multiple Wallets + Search + Demo Mode)
 
 ---
 
@@ -63,4 +63,4 @@
 ---
 
 ### **FINAL VERDICT: PASS WITH PATCHES**
-The application architecture is robust. Once the `WalletsScreen` state and transition bugs are patched, the app will meet 100% of the v1.0.1 Deep QA requirements.
+The application architecture is robust. Once the `WalletsScreen` state and transition bugs are patched, the app will meet 100% of the v1.0 Deep QA requirements.

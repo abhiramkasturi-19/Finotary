@@ -1,5 +1,5 @@
 // src/screens/SettingsScreen.js
-// Finotary v1.0.1 — Pro badge · App Lock · CSV Export · Passcode Export · Wallets · Upgrade row
+// Finotary v1.0 — Pro badge · App Lock · CSV Export · Passcode Export · Wallets · Upgrade row
 
 import React, { useState, useRef } from 'react';
 import {
@@ -526,7 +526,7 @@ const generateCsvString = (transactions, wallets, username) => {
   const min = String(now.getMinutes()).padStart(2, '0');
   const localDateTime = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
   
-  const metaHeader = `# Finotary CSV Export\n# Username: ${username || 'user'}\n# Exported At: ${localDateTime}\n# App Version: 1.0.1\n`;
+  const metaHeader = `# Finotary CSV Export\n# Username: ${username || 'user'}\n# Exported At: ${localDateTime}\n# App Version: 1.0\n`;
   const header = 'Date,Type,Category,Amount,Note,Wallet\n';
   const rows = transactions.map(t => {
     const w = (wallets || []).find(w => w.id === (t.walletId || 'default'))?.name || 'Personal';
@@ -773,7 +773,7 @@ export default function SettingsScreen({ navigation }) {
       const exportMeta = {
         username: settings.name || '',
         exportedAt: new Date().toISOString(),
-        appVersion: '1.0.1'
+        appVersion: '1.0'
       };
       const data = JSON.stringify({ exportMeta, transactions, settings, customCategories, wallets, activeWalletId }, null, 2);
       const sanitized = (settings.name || 'user').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
@@ -802,7 +802,7 @@ export default function SettingsScreen({ navigation }) {
       const exportMeta = {
         username: settings.name || '',
         exportedAt: new Date().toISOString(),
-        appVersion: '1.0.1'
+        appVersion: '1.0'
       };
       const raw = JSON.stringify({ exportMeta, transactions, settings, customCategories, wallets, activeWalletId });
       const enc = encryptJson(raw, password);
@@ -1093,7 +1093,7 @@ export default function SettingsScreen({ navigation }) {
             <View style={s.creditBlock}>
               <Text style={s.creditMadeBy}>crafted by</Text>
               <Text style={s.creditName}>Abhiram Kasturi</Text>
-              <Text style={s.creditFinotary}>Finotary · v1.0.1</Text>
+              <Text style={s.creditFinotary}>Finotary · v1.0</Text>
             </View>
           </ScrollView>
         </SafeAreaView>

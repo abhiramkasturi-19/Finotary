@@ -1,5 +1,5 @@
 // screens/DataInfoScreen.js
-// Finotary v1.0.1 — Onboarding Page 3
+// Finotary v1.0 — Onboarding Page 3
 // Data management explainer → final step before entering the app
 
 import React, { useContext } from 'react';
